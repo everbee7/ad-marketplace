@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S3 · Delivery phases
+- **Branch / PR:** `docs/delivery-phases` (uncommitted, awaiting user approval)
+- **Goal:** turn the flat M0–M8 milestone list into a phased plan for the whole project.
+- **Done:** restructured `docs/product/ROADMAP.md` into Phase 0 (Foundations & de-risking), 1A (Business side → Checkpoint A), 1B (Marketplace & creator library), 1C (Editor & preview → Checkpoint B), 1D (Admin, hardening & launch → Checkpoint C) and Phase 2 (post-MVP tracks 2.0–2.7 from PRD §17). Each phase has entry/exit gates and the client inputs it needs.
+- **Decisions:** preview spike moved to Phase 0 (G3 risk, PRD §16). ADM-02 moved into Phase 1A, so ads can go live at Checkpoint A. Staging deploy moved into Phase 0. MVP estimate 17 → 20 d (spike + 2 feedback days). "Phase 2" keeps its PRD meaning (post-MVP).
+- **Verification:** estimates cross-checked (sum 20 d). All PRD IDs from the old list are still present. Docs only, no code.
+- **Open / next:** user review → `/open-pr`. Then DESIGN.md + M0 scaffold in parallel.
+
 ## 2026-10-02 · S2 · Session continuity, lean service stack, provisional defaults
 - **Branch / PR:** `chore/session-continuity-lean-stack` → PR into `staging`
 - **Goal:** let new sessions continue without explanation. Cut external services for the MVP. Make a local env file. Proceed on default answers while the client is undecided.
