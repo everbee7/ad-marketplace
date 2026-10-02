@@ -7,7 +7,7 @@ import { authorizeUpload } from "@/features/uploads/service";
 import { DomainError, httpStatus } from "@/lib/errors";
 import { getCurrentUser, requireUser } from "@/lib/permissions";
 import { enforce } from "@/lib/ratelimit";
-import { localStat, localStream, localWrite } from "@/lib/storage";
+import { localStat, localStream, localWriteStream } from "@/lib/storage";
 
 // Local storage driver endpoint (API.md): development only. PUT writes an upload the user is
 // authorised for; GET serves files with HTTP Range support so <video> can seek.
@@ -49,11 +49,14 @@ export async function PUT(request: NextRequest, { params }: Ctx) {
       throw new DomainError("MEDIA_INVALID", "This file type isn't allowed here.");
     }
     if (await localStat(pathname)) throw new DomainError("CONFLICT", "File already exists.");
-    const body = Buffer.from(await request.arrayBuffer());
-    if (body.length === 0 || body.length > grant.maximumSizeInBytes) {
-      throw new DomainError("MEDIA_INVALID", "This file is too large.");
-    }
-    const stored = await localWrite(pathname, body, contentType);
+    if (!request.body) throw new DomainError("MEDIA_INVALID", "Empty upload.");
+    const stored = await localWriteStream(
+      pathname,
+      request.body,
+      contentType,
+      grant.maximumSizeInBytes,
+    );
+    if (!stored) throw new DomainError("MEDIA_INVALID", "This file is too large or empty.");
     return NextResponse.json({ url: stored.url, pathname: stored.pathname });
   } catch (err) {
     return errorResponse(err);

@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M4 Creator videos (Phase 1B complete)
+- **Branch / PR:** `feat/m4-creator-videos` (stacked on `feat/m3-marketplace`) → PR into `feat/m3-marketplace`
+- **Goal:** VID-01, VID-02.
+- **Done:** `models/creator-video.ts`, `models/project.ts` (schema from DATA_MODEL, used by M5); `features/videos` (schemas, service: new/retry/finalize/cancel/rename/delete with project cascade + ad `projectCount` sync in one transaction, admin hide flag; queries with per-video project counts and private playback URL; actions; upload form + retry dialog; video list with rename/delete/create-project); pages `/creator/videos`, `/creator/videos/new`; creator home "studio" dashboard. Upload keys `video:<id>:video|poster`. Local dev uploads now stream to disk (`localWriteStream`) so 2 GB files don't sit in memory.
+- **Decisions:** creator videos aren't re-read server-side (up to 2 GB): `head()` checks size + content type, and client-reported duration/codec (stored in `pendingUpload.meta` at reservation) are range-checked (ARCHITECTURE §7.1).
+- **Verification:** `npm run check` (66 tests incl. 7 video integration: MP4/WebM ready, pre-check messages, retry, privacy incl. hidden, list/rename, delete cascade), Playwright creator-videos 3/3.
+- **Open / next:** Phase 1C: M5 Projects & editor, M6 Preview (+ the preview spike).
+
 ## 2026-10-02 · S5 (cont.) · M3 Marketplace
 - **Branch / PR:** `feat/m3-marketplace` (stacked on `feat/m2-business-ads`) → PR into `feat/m2-business-ads`
 - **Goal:** MKT-01..05.

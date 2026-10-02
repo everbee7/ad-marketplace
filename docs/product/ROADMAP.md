@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 1B · M3. Marketplace** (Phase 1A built: M0, M1, M2 + ADM-02; preview spike and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 1C · M5. Projects & editor** (Phases 1A and 1B built: M0–M4 + ADM-02; preview spike and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -113,8 +113,8 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 - [x] MKT-05 Saved ads page
 
 ### M4. Creator videos (≈ 1 d)
-- [ ] VID-01 Upload video (signed playback)
-- [ ] VID-02 My videos
+- [x] VID-01 Upload video (signed playback)
+- [x] VID-02 My videos
 
 ---
 

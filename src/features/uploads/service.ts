@@ -7,6 +7,7 @@ import type { CurrentUser } from "@/lib/permissions";
 import { connectDb } from "@/lib/db";
 import { headObject, ownsUrl, storageDriver, withRandomSuffix } from "@/lib/storage";
 import { Ad } from "@/models/ad";
+import { CreatorVideo } from "@/models/creator-video";
 import { toObjectId } from "@/models/shared";
 
 import { IMAGE_ERROR, type UploadTargetDTO } from "./schemas";
@@ -69,10 +70,29 @@ async function adGrant(
   return null;
 }
 
-/** Extra resolvers for later features (creator videos) keep the same exact-pathname rule. */
-const extraResolvers: Record<string, typeof adGrant> = {};
-export function registerMediaResolver(kind: string, resolver: typeof adGrant) {
-  extraResolvers[kind] = resolver;
+async function videoGrant(
+  user: CurrentUser,
+  videoId: string | undefined,
+  slot: string | undefined,
+  pathname: string,
+) {
+  const id = videoId ? toObjectId(videoId) : null;
+  if (!id || user.role !== "creator") return null;
+  await connectDb();
+  const doc = await CreatorVideo.findOne(
+    { _id: id, creatorId: toObjectId(user.id), deletedAt: null },
+    { pendingUpload: 1 },
+  ).lean();
+  const reserved = doc?.pendingUpload;
+  if (!reserved) return null;
+  if (slot === "video" && pathname === reserved.videoPath) {
+    return {
+      allowedContentTypes: [...limits.creatorVideo.containers],
+      maximumSizeInBytes: limits.creatorVideo.maxSizeBytes,
+    };
+  }
+  if (slot === "poster" && pathname === reserved.posterPath) return POSTER_GRANT;
+  return null;
 }
 
 const IMAGE_EXT: Record<string, string> = {
@@ -128,8 +148,8 @@ export async function authorizeUpload(
   const grant =
     prefix === "ad"
       ? await adGrant(user, docId, slot, pathname)
-      : prefix && extraResolvers[prefix]
-        ? await extraResolvers[prefix](user, docId, slot, pathname)
+      : prefix === "video"
+        ? await videoGrant(user, docId, slot, pathname)
         : null;
   if (!grant) throw new DomainError("FORBIDDEN", "Upload not allowed.");
   return grant;
