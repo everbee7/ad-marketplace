@@ -4,10 +4,7 @@ import type { ImageKind } from "@/config/enums";
 import { limits } from "@/config/limits";
 import { DomainError } from "@/lib/errors";
 import type { CurrentUser } from "@/lib/permissions";
-import { connectDb } from "@/lib/db";
 import { headObject, ownsUrl, storageDriver, withRandomSuffix } from "@/lib/storage";
-import { Ad } from "@/models/ad";
-import { toObjectId } from "@/models/shared";
 
 import { IMAGE_ERROR, type UploadTargetDTO } from "./schemas";
 
@@ -15,65 +12,6 @@ import { IMAGE_ERROR, type UploadTargetDTO } from "./schemas";
 // Used by the Blob token route and the local dev-files route, so both drivers enforce the same rules.
 
 export type UploadGrant = { allowedContentTypes: string[]; maximumSizeInBytes: number };
-
-/** Media slots of doc-bound uploads (ads, creator videos): key = `<kind>:<docId>:<slot>`. */
-export type MediaSlot = "video" | "poster";
-
-const POSTER_GRANT: UploadGrant = {
-  allowedContentTypes: ["image/jpeg"],
-  maximumSizeInBytes: limits.image.maxSizeBytes,
-};
-
-/** Reserved pathnames for a new media upload (ARCHITECTURE §7.2 step 2). */
-export function mediaPaths(base: "ads" | "videos", docId: string, ext: string) {
-  return {
-    videoPath: withRandomSuffix(`${base}/${docId}/video`, ext),
-    posterPath: withRandomSuffix(`${base}/${docId}/poster`, "jpg"),
-  };
-}
-
-export function mediaTargets(
-  kind: "ad" | "video",
-  docId: string,
-  paths: { videoPath: string; posterPath: string },
-) {
-  const driver = storageDriver();
-  return {
-    video: { driver, pathname: paths.videoPath, uploadKey: `${kind}:${docId}:video` },
-    poster: { driver, pathname: paths.posterPath, uploadKey: `${kind}:${docId}:poster` },
-  };
-}
-
-async function adGrant(
-  user: CurrentUser,
-  adId: string | undefined,
-  slot: string | undefined,
-  pathname: string,
-) {
-  const id = adId ? toObjectId(adId) : null;
-  if (!id || user.role !== "business") return null;
-  await connectDb();
-  const ad = await Ad.findOne(
-    { _id: id, businessId: toObjectId(user.id), deletedAt: null },
-    { pendingUpload: 1 },
-  ).lean();
-  const reserved = ad?.pendingUpload;
-  if (!reserved) return null;
-  if (slot === "video" && pathname === reserved.videoPath) {
-    return {
-      allowedContentTypes: [...limits.ad.containers],
-      maximumSizeInBytes: limits.ad.maxSizeBytes,
-    };
-  }
-  if (slot === "poster" && pathname === reserved.posterPath) return POSTER_GRANT;
-  return null;
-}
-
-/** Extra resolvers for later features (creator videos) keep the same exact-pathname rule. */
-const extraResolvers: Record<string, typeof adGrant> = {};
-export function registerMediaResolver(kind: string, resolver: typeof adGrant) {
-  extraResolvers[kind] = resolver;
-}
 
 const IMAGE_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -110,29 +48,17 @@ export async function authorizeUpload(
   if (!PATH_RE.test(pathname) || pathname.includes("..")) {
     throw new DomainError("FORBIDDEN", "Upload not allowed.");
   }
-  const [prefix, ...rest] = uploadKey.split(":");
-  if (prefix === "image") {
-    const kind = rest[0] as ImageKind | undefined;
-    if (!kind || !["logo", "avatar", "thumbnail"].includes(kind)) {
-      throw new DomainError("FORBIDDEN", "Upload not allowed.");
-    }
-    if (!pathname.startsWith(imagePrefix(user.id, kind))) {
-      throw new DomainError("FORBIDDEN", "Upload not allowed.");
-    }
-    return {
-      allowedContentTypes: [...limits.image.contentTypes],
-      maximumSizeInBytes: limits.image.maxSizeBytes,
-    };
+  const [prefix, kind] = uploadKey.split(":");
+  if (prefix !== "image" || !kind || !["logo", "avatar", "thumbnail"].includes(kind)) {
+    throw new DomainError("FORBIDDEN", "Upload not allowed.");
   }
-  const [docId, slot] = rest;
-  const grant =
-    prefix === "ad"
-      ? await adGrant(user, docId, slot, pathname)
-      : prefix && extraResolvers[prefix]
-        ? await extraResolvers[prefix](user, docId, slot, pathname)
-        : null;
-  if (!grant) throw new DomainError("FORBIDDEN", "Upload not allowed.");
-  return grant;
+  if (!pathname.startsWith(imagePrefix(user.id, kind as ImageKind))) {
+    throw new DomainError("FORBIDDEN", "Upload not allowed.");
+  }
+  return {
+    allowedContentTypes: [...limits.image.contentTypes],
+    maximumSizeInBytes: limits.image.maxSizeBytes,
+  };
 }
 
 /**
