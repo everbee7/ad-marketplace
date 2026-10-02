@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S4 · Delivery phases
+- **Branch / PR:** `docs/delivery-phases` → PR #3, merged
+- **Goal:** turn the flat M0–M8 milestone list into a phased plan for the whole project.
+- **Done:** restructured `docs/product/ROADMAP.md` into Phase 0 (Foundations & de-risking), 1A (Business side → Checkpoint A), 1B (Marketplace & creator library), 1C (Editor & preview → Checkpoint B), 1D (Admin, hardening & launch → Checkpoint C) and Phase 2 (post-MVP tracks 2.0–2.7 from PRD §17). Each phase has entry/exit gates and the client inputs it needs.
+- **Decisions:** preview spike moved to Phase 0 (G3 risk, PRD §16). ADM-02 moved into Phase 1A, so ads can go live at Checkpoint A. Staging deploy moved into Phase 0. MVP estimate 17 → 20 d (spike + 2 feedback days). "Phase 2" keeps its PRD meaning (post-MVP).
+- **Verification:** estimates cross-checked (sum 20 d). All PRD IDs from the old list are still present. Docs only, no code.
+- **Open / next:** user review → `/open-pr`. Then DESIGN.md + M0 scaffold in parallel.
+
 ## 2026-10-02 · S3 · Design system v0.1 from the Bubble prototype
 - **Branch / PR:** `docs/design-system` → PR #2 into `staging`
 - **Goal:** turn the client's two Bubble screens (landing, business portal) into design instructions.
