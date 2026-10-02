@@ -30,7 +30,7 @@ One per user (business or creator).
 | `userId` | ObjectId → user | unique |
 | `role` | `business \| creator` | Copied from user for queries |
 | `business` | `{ companyName, logoUrl, website, category, description }` \| null | Required when role = business |
-| `creator` | `{ displayName, avatarUrl, niche, bio, socialLinks: { youtube, tiktok, instagram, other } }` \| null | Required when role = creator |
+| `creator` | `{ displayName, avatarUrl, niche, bio, socialLinks: { youtube, tiktok, instagram, other } }` \| null | Required when role = creator. `niche` uses the category list below (default until the client says otherwise) |
 
 Indexes: `{ userId: 1 } unique`, text index on `business.companyName` (Marketplace search joins through `ads.businessName`, see below).
 
