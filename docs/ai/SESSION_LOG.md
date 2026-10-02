@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S3 · Design system v0.1 from the Bubble prototype
+- **Branch / PR:** `docs/design-system` (not yet pushed)
+- **Goal:** turn the client's two Bubble screens (landing, business portal) into design instructions.
+- **Done:** scraped both pages with headless Chrome (playwright-core in the session scratchpad, not a project dependency): screenshots + computed styles. Wrote `docs/design/DESIGN.md` v0.1 (brand, colour tokens, type scale, spacing/radii/glow, icons, components, screens, editor, a11y, client questions). Screenshots in `docs/design/reference/`. README status and ROADMAP M0 tick updated.
+- **Decisions:** dark-only MVP; blue `#4B9CD3` is the only accent (outlined + glow buttons); Helvetica display + Archivo (next/font) pairing; status/success/error colours, editor visuals and motion marked provisional. Prototype's AU / Balance blocks are not in the PRD, so not built until a PRD change.
+- **Verification:** token values taken from computed styles; contrast of text tokens on black checked by calculation (≥ 5.3:1).
+- **Open / next:** client sign-off on DESIGN.md §10. Then the M0 scaffold (map tokens into `src/app/globals.css` `@theme`).
+
 ## 2026-10-02 · S2 · Session continuity, lean service stack, provisional defaults
 - **Branch / PR:** `chore/session-continuity-lean-stack` → PR into `staging`
 - **Goal:** let new sessions continue without explanation. Cut external services for the MVP. Make a local env file. Proceed on default answers while the client is undecided.

@@ -2,16 +2,16 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-02 · after S2
+Last updated: 2026-10-02 · after S3
 
 ## Where we are
 - **Milestone:** M0 Foundations. Docs, agent workflow, session continuity and the lean service stack are done. **The app is not scaffolded yet** (no `package.json`).
 - **Repo:** github.com/everbee7/ad-marketplace (public). Default branch `staging`. `main` and `staging` are protected: PR required, no force-push. Required CI checks are not set yet because the workflows don't exist.
-- **Open work:** branch `chore/session-continuity-lean-stack` → PR into `staging` (see `gh pr list`).
+- **Open work:** branch `docs/design-system` (DESIGN.md v0.1), committed locally, not pushed yet.
 
 ## Next up (in order)
-1. Merge the S2 PR into `staging`, if it isn't merged yet.
-2. **Design system:** fill in `docs/design/DESIGN.md` together with the user (they will drive style choices).
+1. Push `docs/design-system` and open its PR into `staging` (`/open-pr`). The S2 PR is already merged (#1).
+2. **Design system:** v0.1 done in `docs/design/DESIGN.md` (from the Bubble prototype, branch `docs/design-system`). Open the PR; get client sign-off on DESIGN.md §10 (provisional colours, fonts, logo SVGs, AU/Balance blocks not in PRD).
 3. **M0 scaffold** (see ROADMAP M0): Next.js 16 + TS strict + Tailwind v4 + shadcn, ESLint/Prettier/Husky, `src/env.ts`, `lib/db.ts`, `lib/logger.ts`, `lib/storage.ts` (local driver), `lib/email.ts` (console), `scripts/db-local.ts`, Vitest, Playwright, CI workflows (`ci.yml`, `security.yml`). Then add `ci` and `security` as required checks on `main`/`staging`.
 4. Vercel project + Blob store, and MongoDB Atlas (staging/prod). Only needed before the first deploy.
 
