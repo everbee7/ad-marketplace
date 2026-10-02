@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M3 Marketplace
+- **Branch / PR:** `feat/m3-marketplace` (stacked on `feat/m2-business-ads`) → PR into `feat/m2-business-ads`
+- **Goal:** MKT-01..05.
+- **Done:** `models/saved-ad.ts`; `features/marketplace` (URL-serialisable query schema, keyset-cursor search with category/duration/aspect filters and `$text`, detail visibility, saved list with unavailable flag, transactional save/unsave keeping `saveCount` in sync, actions); `/api/marketplace`; components (ad card with hover/in-view preview honouring reduced motion, filters, infinite grid with Load more fallback, save button, saved store for cross-page consistency, saved list); pages `/marketplace`, `/marketplace/[adId]`, `/creator/saved`; TanStack Query provider. `scripts/seed-demo.ts` (demo business + 4 approved ads through the services; E2E global setup uses it); fixture posters via ffmpeg; whole `tests/fixtures/media/` ignored.
+- **Fixes found on the way:** CI failure on #5: `.gitignore` `uploads/` also hid `src/features/uploads` and `src/app/api/uploads` → anchored to `/uploads/`, files added to M1 and M2 (merge, no force-push). Dropped global `sanitizeFilter` (blocks `$text`). Duplicate sibling React keys on the Marketplace page; uncontrolled→controlled Select warning.
+- **Verification:** `npm run check` (59 tests incl. 10 marketplace integration: visibility, 24/page keyset with concurrent insert, filters, text search, sort, detail 404, save idempotency/counters, saved list), Playwright marketplace suite 3/3 + earlier suites; console-error check on key pages clean; screenshots reviewed.
+- **Open / next:** M4 Creator videos (VID-01..02).
+
 ## 2026-10-02 · S5 (cont.) · M2 Business ads + ADM-02 (Phase 1A complete)
 - **Branch / PR:** `feat/m2-business-ads` (stacked on `feat/m1-accounts`) → PR into `feat/m1-accounts`
 - **Goal:** AD-01..07 and ADM-02 (review queue), so PRD §13 paths 1, 2, 5 run end to end.

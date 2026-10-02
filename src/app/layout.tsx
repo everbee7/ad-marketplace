@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 
+import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { publicEnv } from "@/env";
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${archivo.variable} dark h-full`}>
       <body className="flex min-h-full flex-col">
-        <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+        <Providers>
+          <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+        </Providers>
         <Toaster position="bottom-right" />
       </body>
     </html>

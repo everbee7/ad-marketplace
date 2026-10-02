@@ -2,7 +2,14 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
-import { ADMIN, completeBusinessOnboarding, logIn, logOut, signUpAndVerify } from "./helpers";
+import {
+  ADMIN,
+  completeBusinessOnboarding,
+  completeCreatorOnboarding,
+  logIn,
+  logOut,
+  signUpAndVerify,
+} from "./helpers";
 
 // Visual pass for checkpoint demos: `SCREENSHOTS=1 npx playwright test screens`.
 // Images land in test-results/screens (gitignored). Not part of the normal suite.
@@ -47,4 +54,35 @@ test("Checkpoint A screens", async ({ page }) => {
   await page.goto("/admin/review");
   await page.waitForTimeout(1500);
   await page.screenshot({ path: out("admin-review"), fullPage: true });
+});
+
+test("Phase 1B screens", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await signUpAndVerify(page, "creator");
+  await completeCreatorOnboarding(page);
+  await page.goto("/marketplace");
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: out("marketplace"), fullPage: true });
+  await page.getByRole("link", { name: "Sunrise Coffee Flash" }).click();
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: out("marketplace-detail"), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/marketplace");
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: out("marketplace-mobile"), fullPage: true });
+});
+
+test("no console errors on key pages", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") errors.push(`${page.url()}: ${m.text().slice(0, 200)}`);
+  });
+  await signUpAndVerify(page, "creator");
+  await completeCreatorOnboarding(page);
+  for (const p of ["/marketplace", "/creator/saved", "/creator/profile"]) {
+    await page.goto(p);
+    await page.waitForTimeout(1500);
+  }
+  expect(errors).toEqual([]);
 });
