@@ -3,7 +3,7 @@
 > Source of truth for collections, fields, indexes and invariants. Mongoose models live in `src/models/`, one file per collection, and must match this doc.
 > Changing a schema? Update this file in the same PR and call it out in the PR description (see [GIT_WORKFLOW.md](GIT_WORKFLOW.md)).
 
-Last updated: 2026-10-02
+Last updated: 2026-10-02 (lean stack, ADR-0005)
 
 General rules:
 - `timestamps: true` on every app collection (`createdAt`, `updatedAt`).
@@ -13,7 +13,7 @@ General rules:
 
 ## Collections owned by Better Auth
 
-`user`, `session`, `account`, `verification`. Their shape is managed by Better Auth. App code reads them only through `lib/auth.ts`.
+`user`, `session`, `account`, `verification`, `rateLimit`. Their shape is managed by Better Auth. App code reads them only through `lib/auth.ts`.
 Extra user fields we add:
 
 | Field | Type | Notes |
@@ -44,22 +44,24 @@ Indexes: `{ userId: 1 } unique`, text index on `business.companyName` (Marketpla
 | `description` | string | ≤ 1000 |
 | `category` | enum (categories) | |
 | `tags` | string[] | ≤ 10, each ≤ 30, lowercased, deduped |
-| `status` | `uploading \| processing \| failed \| pending_review \| live \| unlisted \| rejected \| removed` | Transitions only via `features/ads/service.ts` |
+| `status` | `uploading \| failed \| pending_review \| live \| unlisted \| rejected \| removed` | Transitions only via `features/ads/service.ts` |
 | `rejectionReason` / `removalReason` | string \| null | |
 | `video` | `VideoAsset` (below) | Currently active asset |
 | `pendingVideo` | `VideoAsset` \| null | New video under review while the old one stays live (PRD AD-05 AC2) |
-| `customThumbnailUrl` | string \| null | Blob URL. Overrides the Mux thumbnail |
+| `customThumbnailUrl` | string \| null | Optional business-chosen cover. Overrides the auto poster |
 | `saveCount` / `projectCount` | number | Denormalised counters, updated in the same operation as the source write |
 | `submittedAt` / `approvedAt` / `removedAt` / `deletedAt` | Date \| null | |
 
-`VideoAsset` = `{ muxUploadId, muxAssetId, playbackId, mp4Url, durationSec, aspectRatio, width, height, errorMessage }`
+`VideoAsset` = `{ url, pathname, posterUrl, sizeBytes, contentType, codec, durationSec, width, height, aspectRatio, errorMessage }`
+- `url`/`posterUrl` come from `lib/storage.ts` (Blob, or `/api/dev-files/...` locally). `pathname` is kept so the storage object can be deleted.
+- `durationSec`/`codec` for ads are server-verified (mp4box). For creator videos they are client-reported and range-checked.
 
 Indexes:
 - `{ status: 1, createdAt: -1, _id: -1 }`: Marketplace newest (cursor)
 - `{ status: 1, category: 1, createdAt: -1 }`: filtered listing
 - `{ status: 1, saveCount: -1, _id: -1 }`, `{ status: 1, projectCount: -1, _id: -1 }`: sorts
 - `{ businessId: 1, createdAt: -1 }`: business dashboard
-- `{ "video.muxUploadId": 1 }`, `{ "video.muxAssetId": 1 }`, plus the same on `pendingVideo`: webhook lookup
+- `{ status: 1, updatedAt: 1 }`: cron cleanup of stale `uploading` and deleted docs
 - Text: `{ title: "text", description: "text", tags: "text", businessName: "text" }`. Upgrade path is Atlas Search
 
 ## `creatorVideos`
@@ -69,12 +71,12 @@ Indexes:
 | `creatorId` | ObjectId → user | |
 | `title` | string | 3–100 |
 | `description` | string | ≤ 1000 |
-| `status` | `uploading \| processing \| ready \| failed` | |
-| `video` | `VideoAsset` | Signed playback, no `mp4Url` |
+| `status` | `uploading \| ready \| failed` | |
+| `video` | `VideoAsset` | URL is unguessable. Only rendered for the owner and admins |
 | `hiddenByAdmin` | boolean | |
 | `deletedAt` | Date \| null | |
 
-Indexes: `{ creatorId: 1, createdAt: -1 }`, `{ "video.muxUploadId": 1 }`, `{ "video.muxAssetId": 1 }`
+Indexes: `{ creatorId: 1, createdAt: -1 }`, `{ status: 1, updatedAt: 1 }`
 
 ## `savedAds`
 
@@ -117,6 +119,16 @@ Indexes: `{ creatorId: 1, updatedAt: -1 }`, `{ creatorVideoId: 1 }`, `{ "bursts.
 | `reason` | string \| null |
 
 Index: `{ targetType: 1, targetId: 1, createdAt: -1 }`. Append-only, never updated.
+
+## `rateLimits`
+
+Fixed-window counters for `lib/ratelimit.ts` (ADR-0005, replaces Redis).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `_id` | string | `<bucket>:<key>:<windowStartEpoch>`, e.g. `upload:<userId>:1759363200` |
+| `count` | number | `$inc` with `upsert` in one `findOneAndUpdate` |
+| `expiresAt` | Date | Window end. **TTL index** `{ expiresAt: 1 }, { expireAfterSeconds: 0 }` |
 
 ## Reference data (`src/config/categories.ts`)
 

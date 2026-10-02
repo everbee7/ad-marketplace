@@ -4,7 +4,7 @@
 | --- | --- |
 | Product | Flashd (working name, taken from the prototype URL) |
 | Document | Product Requirements Document, MVP (v1.0) |
-| Status | **Draft.** Open questions in §15 must be resolved before M2 starts |
+| Status | **Draft.** Client answers pending. The §15 defaults are **in effect provisionally** (A7) |
 | Last updated | 2026-10-02 |
 | Source brief | [JOB_DESCRIPTION.md](JOB_DESCRIPTION.md) |
 | Visual reference | Bubble prototype: https://flashd-53080.bubbleapps.io/version-test/ |
@@ -96,7 +96,7 @@ Rules:
 ## 6. User Journeys
 
 **J1. Business publishes an ad**
-Sign up as business → verify email → complete company profile → upload burst ad → status shows *Processing*, then *Pending review* → admin approves → status is *Live* and the ad appears in the Marketplace.
+Sign up as business → verify email → complete company profile → upload burst ad → status shows *In review* → admin approves → status is *Live* and the ad appears in the Marketplace.
 
 **J2. Creator builds a project**
 Sign up as creator → verify email → complete creator profile → browse or search the Marketplace → save ads → upload a video → create a project → add bursts on the timeline → preview → save → reopen later and edit.
@@ -114,7 +114,7 @@ Priority uses MoSCoW: **M** = Must (launch blocker), **S** = Should (in MVP if o
 | Module | ID prefix | Summary | Priority |
 | --- | --- | --- | --- |
 | Accounts & onboarding | `AUTH`, `PRF` | Sign-up with role, email verification, login, password reset, profiles | M |
-| Business ads | `AD` | Upload, processing, dashboard, edit, unlist, delete | M |
+| Business ads | `AD` | Upload, dashboard, edit, unlist, delete | M |
 | Marketplace | `MKT` | Browse, search, filter, ad detail, save | M |
 | Creator videos | `VID` | Upload, list, rename, delete | M |
 | Projects & placement editor | `PRJ` | Create project, place bursts on a timeline, auto-save | M |
@@ -169,14 +169,14 @@ Commits, PRs and tests reference these IDs (see [AGENTS.md](../../AGENTS.md)).
 
 **AD-01 · Upload burst ad** (M)
 - Form: title\* (3–100 characters), description (≤ 1000), category\*, tags (≤ 10, each ≤ 30 characters), video file\*, optional custom thumbnail.
-- Video limits: MP4, MOV or WebM. Duration **0.5–2.0 s**. File size ≤ **50 MB** (see §10).
-- AC1: The browser checks file type, size and duration before uploading and shows a specific error for each kind of failure.
+- Video limits: MP4 or MOV with H.264 video. Duration **0.5–2.0 s**. File size ≤ **50 MB** (see §10).
+- AC1: The browser checks file type, video format, size and duration before uploading and shows a specific error for each kind of failure. An unsupported format (e.g. iPhone "High Efficiency" HEVC) shows: "This video format isn't supported. Please export it as MP4 (H.264) and try again."
 - AC2: A progress bar shows the upload percentage. The user can cancel.
-- AC3: After the upload, the status reads *Processing* and updates without a page reload.
-- AC4: When processing finishes, the status becomes *Pending review*.
-- AC5: If the processed duration is outside 0.5–2.0 s (± 0.05 s tolerance), the ad moves to *Failed* with the message "Burst ads must be 0.5–2 seconds long."
+- AC3: When the upload finishes, the ad is checked automatically and its status becomes *In review* (`pending_review`) without a page reload. There is no separate processing wait.
+- AC4: The ad's cover image is taken automatically from the video. The business can replace it with a custom thumbnail.
+- AC5: If the verified duration is outside 0.5–2.0 s (± 0.05 s tolerance), the ad moves to *Failed* with the message "Burst ads must be 0.5–2 seconds long."
 
-**AD-02 · Processing failure & retry** (M)
+**AD-02 · Upload failure & retry** (M)
 - AC1: A failed ad shows the reason and a "Replace video" action that starts a new upload on the same ad without losing its metadata.
 
 **AD-03 · My ads dashboard** (M)
@@ -232,10 +232,10 @@ Commits, PRs and tests reference these IDs (see [AGENTS.md](../../AGENTS.md)).
 ### 8.4 Creator Videos
 
 **VID-01 · Upload video** (M)
-- Form: title\*, description, file\*. MP4, MOV or WebM. Duration ≤ **15 min**. File size ≤ **2 GB** (see §10).
+- Form: title\*, description, file\*. MP4, MOV (H.264) or WebM. Duration ≤ **15 min**. File size ≤ **2 GB**, with ≤ 500 MB recommended in the UI (see §10).
 - AC1: Same upload experience as AD-01 (pre-checks, progress, cancel, live status).
-- AC2: The status goes *Processing* → *Ready*, or *Failed* with a retry option.
-- AC3: Creator videos are private. Only the owner and admins can play them.
+- AC2: The status goes *Uploading* → *Ready* as soon as the upload finishes, or *Failed* with a retry option.
+- AC3: Creator videos are private. They are shown only to the owner and admins, and never listed or linked publicly.
 
 **VID-02 · My videos** (M)
 - List: thumbnail, title, duration, status, number of projects. Actions: Rename, Create project, Delete.
@@ -317,8 +317,7 @@ Commits, PRs and tests reference these IDs (see [AGENTS.md](../../AGENTS.md)).
 
 | Status | Shown to business as | In Marketplace | Can be newly placed | Moves to |
 | --- | --- | :---: | :---: | --- |
-| `uploading` | Uploading… | — | — | `processing`, `failed` |
-| `processing` | Processing… | — | — | `pending_review`, `failed` |
+| `uploading` | Uploading… | — | — | `pending_review`, `failed` |
 | `failed` | Failed (reason) | — | — | `uploading` (replace video) |
 | `pending_review` | In review | — | — | `live`, `rejected` |
 | `live` | Live | ✅ | ✅ | `unlisted`, `removed`, `pending_review` (video replaced) |
@@ -329,7 +328,7 @@ Commits, PRs and tests reference these IDs (see [AGENTS.md](../../AGENTS.md)).
 A deleted ad (by its business) is soft-deleted and no longer shown anywhere except admin tables.
 
 ### 9.2 Creator video
-`uploading → processing → ready`, or `failed` (retry possible). An admin can hide a video at any time.
+`uploading → ready`, or `failed` (retry possible). An admin can hide a video at any time.
 
 ### 9.3 Project
 `draft ⇄ saved`. A project is deleted when its user deletes it or deletes its video.
@@ -344,7 +343,7 @@ All limits are defined once in code (`src/config/limits.ts`) and must match this
 | Burst ad file size | ≤ 50 MB | |
 | Creator video duration | ≤ 15 min | Pending OQ-3 |
 | Creator video file size | ≤ 2 GB | |
-| Accepted video formats | MP4, MOV, WebM | |
+| Accepted video formats | Ads: MP4/MOV with H.264. Creator videos: MP4/MOV (H.264) or WebM | No server-side conversion in the MVP (ADR-0005). HEVC is rejected with a clear message |
 | Image uploads (logo, avatar, thumbnail) | JPG, PNG, WebP, ≤ 5 MB | |
 | Bursts per project | 1–10 | Pending OQ-4 |
 | Minimum spacing between bursts | 1.0 s of creator-video time | |
@@ -364,7 +363,7 @@ All limits are defined once in code (`src/config/limits.ts`) and must match this
 
 | Area | Requirement |
 | --- | --- |
-| Performance | Marketplace first page LCP ≤ 2.5 s on 4G. Read APIs p95 ≤ 500 ms (video provider excluded). Editor opens in ≤ 3 s for a 15-minute video on broadband. |
+| Performance | Marketplace first page LCP ≤ 2.5 s on 4G. Read APIs p95 ≤ 500 ms. Editor opens in ≤ 3 s for a 15-minute video on broadband. |
 | Preview quality | G3 timing targets on the browser matrix below. |
 | Security | Server-side checks of session, role and ownership on every mutation. Input validation on every boundary. Private creator video playback. No secrets in client bundles. Rate limits as in §10. Security headers (CSP, HSTS, frame-ancestors). |
 | Privacy | Collect only email and profile data. Users can delete their content. Account deletion is handled on request in the MVP (self-serve is Phase 2). |
@@ -372,7 +371,7 @@ All limits are defined once in code (`src/config/limits.ts`) and must match this
 | Accessibility | WCAG 2.2 AA: keyboard reachable, visible focus, labelled fields, alt text, captions toggle where available, reduced-motion respected for auto-playing card previews. |
 | Responsiveness | 360 px and wider. Editor as described in PRJ-02 AC1. |
 | Browser support | Last 2 versions of Chrome, Safari, Firefox and Edge. iOS Safari 16+. Android Chrome. |
-| Observability | Errors are captured with user and request context. Upload and processing failures are logged with the provider error. |
+| Observability | Server and client errors are logged with user and request context in the hosting platform's logs. Upload failures are logged with their reason. |
 
 ## 13. Launch Acceptance (E2E critical paths)
 
@@ -391,7 +390,8 @@ These paths must pass on the production deploy (automated where possible):
 - A2. "Burst ads .05–2 seconds" in the brief means **0.5–2 seconds** (OQ-3).
 - A3. Bursts are **inserted** (the creator video pauses), not overlaid.
 - A4. Preview is in-browser only. No exported file in the MVP (OQ-2).
-- A5. Third-party accounts (Vercel, MongoDB Atlas, Mux, Resend, Upstash, Sentry) are owned by the client, who pays usage costs.
+- A5. The product runs on **two platforms only**: Vercel (hosting, file storage, scheduled jobs) and MongoDB Atlas (database). Production email uses an SMTP mailbox the client already owns. All accounts are owned by the client, who pays usage costs (ADR-0005).
+- A7. Until the client answers [CLIENT_QUESTIONS.md](CLIENT_QUESTIONS.md), every "our suggestion" in it and every default in §15 is treated as decided. Answers that differ are recorded in the ROADMAP decision log and trigger a PRD version bump and re-estimate.
 - A6. English only. Times are shown in the viewer's browser time zone.
 
 ## 15. Open Questions
@@ -419,7 +419,8 @@ The full client-facing questionnaire, in non-technical wording, is [CLIENT_QUEST
 | --- | --- | --- |
 | Precise burst timing on Safari/iOS | Preview feels jumpy (G3 missed) | Preload all burst clips as MP4 in memory. Use frame-accurate timing APIs. Test on iOS from M6 day 1 (see ARCHITECTURE §Preview) |
 | Client expects a downloadable file | Timeline overrun | Resolve OQ-2 at kickoff |
-| Video provider costs | Budget | Clean up assets, cap uploads, use smallest renditions that meet quality |
+| Storage and bandwidth costs | Budget | Clean up assets, cap uploads, recommend ≤ 500 MB creator videos |
+| No server-side video conversion | Some phone videos (HEVC) are rejected, and large videos stream as one file | Clear export instructions in the error. Switching to a video service later stays isolated behind `lib/storage.ts` (ADR-0005) |
 | Prototype or scope changes mid-build | Schedule slip | Freeze scope per milestone. Changes go to the backlog with a PRD version bump |
 | Slow client feedback | Schedule slip | Fixed demo checkpoints (ROADMAP). 1 business day feedback window |
 
@@ -432,5 +433,6 @@ Downloadable rendered video · overlay placements · business placement preferen
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-10-02 | First draft (`archive/MVP_PRD_v0.md`) |
+| 1.0-draft.2 | 2026-10-02 | Lean stack (ADR-0005): no processing state, H.264/WebM only, two platforms. A7: provisional defaults in effect |
 | 1.0-draft.1 | 2026-10-02 | Added OQ-9..12 and a mapping to the client questionnaire (CLIENT_QUESTIONS.md) |
 | 1.0-draft | 2026-10-02 | Restructured to product-only PRD. Burst-ad model (0.5–2 s, up to 10 inserted bursts per video). Technical design moved to `docs/engineering/`. Added metrics, journeys, priorities and open-question defaults. |

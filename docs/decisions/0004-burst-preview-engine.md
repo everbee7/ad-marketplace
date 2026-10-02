@@ -1,6 +1,6 @@
 # ADR-0004: Client-side burst preview with preloaded MP4 clips
 
-- **Status:** Accepted
+- **Status:** Accepted. Clip source amended by [ADR-0005](0005-lean-service-stack.md) (MP4 files from Blob instead of Mux renditions; plain `<video>` instead of Mux Player)
 - **Date:** 2026-10-02
 - **Related:** PRV-01..04, PRJ-03, PRD G3
 

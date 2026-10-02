@@ -10,6 +10,7 @@ Rules:
 | ADR | Title | Status | Date |
 | --- | --- | --- | --- |
 | [0001](0001-core-stack.md) | Core stack: Next.js on Vercel with MongoDB Atlas | Accepted | 2026-10-02 |
-| [0002](0002-auth-better-auth.md) | Authentication with Better Auth | Accepted | 2026-10-02 |
-| [0003](0003-video-mux.md) | Mux for video upload, processing and playback | Accepted | 2026-10-02 |
-| [0004](0004-burst-preview-engine.md) | Client-side burst preview with preloaded MP4 clips | Accepted | 2026-10-02 |
+| [0002](0002-auth-better-auth.md) | Authentication with Better Auth | Accepted (amended by 0005) | 2026-10-02 |
+| [0003](0003-video-mux.md) | Mux for video upload, processing and playback | Superseded by 0005 | 2026-10-02 |
+| [0004](0004-burst-preview-engine.md) | Client-side burst preview with preloaded MP4 clips | Accepted (amended by 0005) | 2026-10-02 |
+| [0005](0005-lean-service-stack.md) | Lean MVP service stack: Vercel + MongoDB only | Accepted | 2026-10-02 |

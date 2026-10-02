@@ -51,7 +51,7 @@ Checklist:
 
 Examples:
 - `feat(preview): trigger bursts with requestVideoFrameCallback`. Body: `timeupdate` fires about every 250 ms, which misses PRV-01 AC3's ±100 ms target.
-- `fix(uploads): ignore out-of-order Mux webhooks`. Body: `asset.ready` can arrive before `upload.asset_created`, and the status used to regress to processing.
+- `fix(uploads): re-verify ad duration on the server`. Body: client-reported duration can be spoofed, so finalizeUpload now parses the MP4 header to enforce AD-01 AC5.
 
 ## Pull requests
 

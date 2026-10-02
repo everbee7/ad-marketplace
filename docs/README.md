@@ -26,6 +26,7 @@ product/PRD.md                    WHAT & WHY: requirements (IDs + acceptance cri
                         code (src/), tests reference PRD IDs
 ```
 
+Session continuity: [ai/STATE.md](ai/STATE.md) (current snapshot) + [ai/SESSION_LOG.md](ai/SESSION_LOG.md) (history). Read first in every new session.
 Process docs: [engineering/GIT_WORKFLOW.md](engineering/GIT_WORKFLOW.md) (branches, commits, PRs, CI/CD).
 Agent instructions: [/AGENTS.md](../AGENTS.md) (all agents), [/CLAUDE.md](../CLAUDE.md) (Claude Code specifics).
 
@@ -43,16 +44,20 @@ Agent instructions: [/AGENTS.md](../AGENTS.md) (all agents), [/CLAUDE.md](../CLA
 | --- | --- |
 | A user-visible behaviour, rule, limit or message | PRD (bump the change log) + `src/config/*` if it's a limit |
 | A collection, field or index | DATA_MODEL.md |
+| Answers from the client | ROADMAP decision log → PRD (version bump) |
 | A route handler, server action or DTO | API.md |
 | An env var | `.env.example` + `src/env.ts` + ARCHITECTURE §11 |
 | A significant technical choice | New ADR + decisions/README.md index |
 | Delivered a requirement | Tick it in ROADMAP.md |
+| Finished a work session (or a requirement) | ai/STATE.md (overwrite) + ai/SESSION_LOG.md (new entry) |
 | A visual token or component pattern | DESIGN.md |
 
 ## Index
 
 | Doc | Purpose | Status |
 | --- | --- | --- |
+| [ai/STATE.md](ai/STATE.md) | Where we are, next steps, gotchas | Living (snapshot) |
+| [ai/SESSION_LOG.md](ai/SESSION_LOG.md) | What each session did | Living (append-only) |
 | [product/JOB_DESCRIPTION.md](product/JOB_DESCRIPTION.md) | Original client brief | Frozen |
 | [product/CLIENT_QUESTIONS.md](product/CLIENT_QUESTIONS.md) | Scope questions for the (non-technical) client | Ready to send |
 | [product/PRD.md](product/PRD.md) | Product requirements | v1.0-draft |

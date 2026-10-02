@@ -1,6 +1,6 @@
 # ADR-0002: Authentication with Better Auth
 
-- **Status:** Accepted
+- **Status:** Accepted. Email transport amended by [ADR-0005](0005-lean-service-stack.md) (SMTP/console instead of Resend)
 - **Date:** 2026-10-02
 - **Related:** AUTH-01..05, PRF-01
 

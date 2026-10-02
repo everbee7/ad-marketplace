@@ -28,7 +28,7 @@ For work touching more than about 3 files, schemas or the preview engine, wait f
 - Follow `AGENTS.md` non-negotiables and `docs/engineering/CONVENTIONS.md`.
 - Server first: schema → model → service (transitions) → queries/actions/handlers → UI.
 - UI: if `docs/design/DESIGN.md` is still undefined, use shadcn defaults and mark `// TODO(design)`.
-- For library APIs (Next.js 16, Better Auth, Mux, Tailwind v4), check the current docs rather than memory.
+- For library APIs (Next.js 16, Better Auth, Vercel Blob, mp4box.js, Tailwind v4), check the current docs rather than memory.
 
 ## 4. Verify
 - Run `npm run check` and fix everything it reports.
