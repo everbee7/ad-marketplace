@@ -32,9 +32,9 @@ Last updated: 2026-10-02 (lean stack, ADR-0005)
 | `features/ads/actions.ts` | `startAdUpload` (new ad, or `adId` to replace), `finalizeAdUpload`, `cancelAdUpload` | business (owner) | upload 20/h/user | AD-01/02/05 |
 | `features/profiles/actions.ts` | `completeOnboarding`, `updateProfile` | business / creator | n/a | PRF-01/02 |
 | `features/ads/actions.ts` | `updateAd`, `resubmitAd`, `unlistAd`, `relistAd`, `deleteAd` | business (owner) | n/a | AD-05/06/07 |
-| `features/videos/actions.ts` | `startVideoUpload`, `finalizeVideoUpload`, `cancelVideoUpload` | creator (owner) | upload 20/h/user | VID-01 |
+| `features/videos/actions.ts` | `startVideoUpload` (new, or `videoId` to retry a failed one), `finalizeVideoUpload`, `cancelVideoUpload` | creator (owner) | upload 20/h/user | VID-01 (upload keys `video:<id>:video\|poster`) |
 | `features/marketplace/actions.ts` | `saveAd`, `unsaveAd` | creator | 120/min/user | MKT-04/05 |
-| `features/videos/actions.ts` | `renameVideo`, `deleteVideo` | creator (owner) | n/a | VID-02 |
+| `features/videos/actions.ts` | `renameVideo`, `deleteVideo` (cascades to projects) | creator (owner) | n/a | VID-02 |
 | `features/projects/actions.ts` | `createProject`, `updateBursts` (auto-save with `revision`), `saveProject`, `renameProject`, `duplicateProject`, `deleteProject` | creator (owner) | n/a | PRJ-* |
 | `features/admin/actions.ts` | `approveAd`, `rejectAd`, `removeAd`, `hideVideo`, `unhideVideo` | admin | n/a | ADM-02/03 |
 | `features/errors/actions.ts` | `reportClientError` | any (incl. anonymous) | 30/min/IP | NFR observability |
@@ -55,5 +55,7 @@ Upload keys: `startImageUpload`/`startUpload` return `UploadTargetDTO { driver, 
 - `AdUploadStartDTO`: `{ id, video: UploadTargetDTO, poster: UploadTargetDTO }` (upload keys `ad:<id>:video|poster`)
 - `AdUploadResultDTO`: `{ id, status, errorMessage }`
 - `BusinessAdDTO` (AD-03), `AdDetailDTO` (AD-04: + description, tags, videoUrl, pendingVideoUrl, rejection/removal reason, statusHistory), `ReviewItemDTO` (ADM-02: player URL, metadata, business name/logo/email/website, `isReplacement`)
+
+- `CreatorVideoDTO`: `{ id, title, description, status, posterUrl, durationSec, aspectRatio, projectCount, createdAt, errorMessage, hidden }`; `CreatorVideoDetailDTO` adds `url` (null unless ready and not hidden, or viewer is admin), `width`, `height`
 
 Add new DTOs here when they cross the server/client boundary.

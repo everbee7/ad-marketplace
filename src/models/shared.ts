@@ -48,6 +48,8 @@ export type PendingUpload = {
   videoPath: string;
   posterPath: string;
   startedAt: Date;
+  /** Client-reported facts for creator videos (too large to re-read on the server). */
+  meta?: { durationSec: number; width: number; height: number; codec: string } | null;
 };
 
 export const PendingUploadSchema = new Schema<PendingUpload>(
@@ -55,6 +57,18 @@ export const PendingUploadSchema = new Schema<PendingUpload>(
     videoPath: { type: String, required: true },
     posterPath: { type: String, required: true },
     startedAt: { type: Date, required: true },
+    meta: {
+      type: new Schema(
+        {
+          durationSec: Number,
+          width: Number,
+          height: Number,
+          codec: String,
+        },
+        { _id: false },
+      ),
+      default: null,
+    },
   },
   { _id: false },
 );
