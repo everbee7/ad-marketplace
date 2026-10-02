@@ -211,7 +211,7 @@ FFmpeg rendering does not fit Vercel functions. The planned path is a job record
 
 | Environment | Git branch | Vercel | MongoDB | Storage | Email |
 | --- | --- | --- | --- | --- | --- |
-| Local | any | `next dev` | Local `mongod` via `npm run db:local` (persistent `.data/mongo`), or Atlas dev | `local` driver | `console` |
+| Local | any | `next dev` | Local `mongod` via `npm run db:local` (single-node replica set `rs0` on :27017, persistent `.data/mongo`), or Atlas dev | `local` driver | `console` |
 | Preview | PR branches | Preview deployments | Atlas `staging` DB | Blob (staging store) | `console` (links logged) |
 | Staging | `staging` | Branch domain / custom env | Atlas `staging` DB | Blob (staging store) | SMTP |
 | Production | `main` | Production (Pro plan) | Atlas `production` cluster | Blob (prod store) | SMTP |
@@ -220,6 +220,24 @@ Vercel's Git integration deploys the app. GitHub Actions only verifies the code 
 
 ### 11.1 Environment variables
 The canonical list is [`.env.example`](../../.env.example), validated at boot by `src/env.ts`. When you add a variable, update `.env.example`, `src/env.ts` and the Vercel project, in the same PR. Local secrets live in `.env.local` (gitignored, never read by agents).
+
+Variables read by `src/env.ts` (validation is lazy, so `next build` needs no runtime secrets; errors name the variable, never its value):
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `MONGODB_URI` | yes | Database name comes from the URI path |
+| `BETTER_AUTH_SECRET` | yes | ≥ 32 chars |
+| `BETTER_AUTH_URL` | no | Defaults to `NEXT_PUBLIC_APP_URL` |
+| `NEXT_PUBLIC_APP_URL` | no | Default `http://localhost:3000`. Used in email links |
+| `STORAGE_DRIVER` | no | `local` (default, refused in production) or `blob` |
+| `BLOB_READ_WRITE_TOKEN` | with `blob` | Vercel Blob store token |
+| `EMAIL_TRANSPORT` | no | `console` (default) or `smtp` |
+| `EMAIL_FROM` | no | Sender for SMTP |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD` | with `smtp` | Client-owned mailbox |
+| `CRON_SECRET` | yes | ≥ 16 chars, Bearer token for `/api/cron/*` |
+| `LOG_LEVEL` | no | `debug` · `info` (default) · `warn` · `error` |
+
+Dev note: outside production, `lib/db.ts` appends public DNS resolvers for `mongodb+srv` URIs, because some Windows setups list a local resolver that refuses SRV queries (`querySrv ECONNREFUSED`).
 
 ## 12. Observability
 

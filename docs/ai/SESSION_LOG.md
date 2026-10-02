@@ -14,13 +14,29 @@
 > - **Open / next:** …
 > ```
 
-## 2026-10-02 · S3 · Delivery phases
-- **Branch / PR:** `docs/delivery-phases` (uncommitted, awaiting user approval)
+## 2026-10-02 · S5 · M0 scaffold
+- **Branch / PR:** `chore/m0-scaffold` (from `docs/design-system`) → PR into `staging`
+- **Goal:** Phase 0 foundations: runnable app, core libs, tests, CI.
+- **Done:** Next.js 16.3 app (create-next-app). shadcn radix-nova restyled to DESIGN tokens (`globals.css`, button/input/select/textarea). `env.ts`; `lib/db.ts` (one MongoClient shared by Better Auth and Mongoose); logger; errors/ActionResult; ratelimit (Mongo fixed window); storage (local + blob server side, browser upload client); email (console outbox + SMTP, React Email template); instrumentation; landing page; `/api/health`. Vitest (in-memory replica set, DB per file), Playwright config + isolated e2e server, ffmpeg fixtures, `ci.yml` + `security.yml`.
+- **Decisions:** media fixtures are generated, never committed. mongod 7.0.24 for tests. Local storage URLs are relative `/api/dev-files/...` and only our origin is accepted.
+- **Verification:** `npm run lint`, `typecheck`, `format:check`, `test` (9 passing) and `build` all green. Dev server against the user's Atlas: `/api/health` → db up. Landing screenshots at 1440 and 390 px checked against the prototype.
+- **Open / next:** merge #2 + the M0 PR; Phase 1A (M1 Accounts).
+
+## 2026-10-02 · S4 · Delivery phases
+- **Branch / PR:** `docs/delivery-phases` → PR #3, merged
 - **Goal:** turn the flat M0–M8 milestone list into a phased plan for the whole project.
 - **Done:** restructured `docs/product/ROADMAP.md` into Phase 0 (Foundations & de-risking), 1A (Business side → Checkpoint A), 1B (Marketplace & creator library), 1C (Editor & preview → Checkpoint B), 1D (Admin, hardening & launch → Checkpoint C) and Phase 2 (post-MVP tracks 2.0–2.7 from PRD §17). Each phase has entry/exit gates and the client inputs it needs.
 - **Decisions:** preview spike moved to Phase 0 (G3 risk, PRD §16). ADM-02 moved into Phase 1A, so ads can go live at Checkpoint A. Staging deploy moved into Phase 0. MVP estimate 17 → 20 d (spike + 2 feedback days). "Phase 2" keeps its PRD meaning (post-MVP).
 - **Verification:** estimates cross-checked (sum 20 d). All PRD IDs from the old list are still present. Docs only, no code.
 - **Open / next:** user review → `/open-pr`. Then DESIGN.md + M0 scaffold in parallel.
+
+## 2026-10-02 · S3 · Design system v0.1 from the Bubble prototype
+- **Branch / PR:** `docs/design-system` → PR #2 into `staging`
+- **Goal:** turn the client's two Bubble screens (landing, business portal) into design instructions.
+- **Done:** scraped both pages with headless Chrome (playwright-core in the session scratchpad, not a project dependency): screenshots + computed styles. Wrote `docs/design/DESIGN.md` v0.1 (brand, colour tokens, type scale, spacing/radii/glow, icons, components, screens, editor, a11y, client questions). Screenshots in `docs/design/reference/`. README status and ROADMAP M0 tick updated.
+- **Decisions:** dark-only MVP; blue `#4B9CD3` is the only accent (outlined + glow buttons); Helvetica display + Archivo (next/font) pairing; status/success/error colours, editor visuals and motion marked provisional. Prototype's AU / Balance blocks are not in the PRD, so not built until a PRD change.
+- **Verification:** token values taken from computed styles; contrast of text tokens on black checked by calculation (≥ 5.3:1).
+- **Open / next:** client sign-off on DESIGN.md §10. Then the M0 scaffold (map tokens into `src/app/globals.css` `@theme`).
 
 ## 2026-10-02 · S2 · Session continuity, lean service stack, provisional defaults
 - **Branch / PR:** `chore/session-continuity-lean-stack` → PR into `staging`
