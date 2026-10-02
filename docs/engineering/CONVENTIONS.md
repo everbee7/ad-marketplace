@@ -43,8 +43,10 @@
 | --- | --- | --- |
 | Unit | Vitest | Zod schemas, state transitions, `timeline.ts` (preview mapping), permission helpers, limits |
 | Integration | Vitest + `mongodb-memory-server` | Services and actions against a real Mongo. Upload finalize flow with fixture clips (`tests/fixtures/media/`), incl. HEVC and out-of-range ads |
-| E2E | Playwright | One spec per PRD §13 path, in `tests/e2e/`. Media uses tiny fixture clips in `tests/fixtures/media/` and the `local` storage driver. A smoke run happens against the preview URL |
+| E2E | Playwright | One spec per PRD §13 path, in `tests/e2e/`. Media uses tiny fixture clips in `tests/fixtures/media/` and the `local` storage driver. `scripts/e2e-server.mjs` starts an in-memory MongoDB + `next dev` on :3100 so E2E never touches the dev database. A smoke run happens against the preview URL |
 
+- **Media fixtures are generated, never committed** (`.gitignore` + `security.yml`): `npm run fixtures:media` uses `ffmpeg-static` to create H.264, HEVC, VP9 and out-of-range clips in `tests/fixtures/media/`.
+- `mongodb-memory-server` is pinned to MongoDB **7.0.24** (`package.json` → `config.mongodbMemoryServer`): the 8.x Windows binary crashes with an illegal-instruction error on CPUs without AVX2.
 - Name tests after the requirement: `describe("PRJ-03 place and adjust bursts", …)`.
 - A bug fix starts with a failing test that reproduces it.
 - Do not mock what you own. Mock only what crosses the network (Vercel Blob API, SMTP). Use the `local` storage driver and `console` email in tests instead of mocks where possible.
@@ -56,7 +58,9 @@
 | `npm run dev` | Dev server |
 | `npm run lint` / `npm run lint:fix` | ESLint |
 | `npm run format` | Prettier write |
-| `npm run typecheck` | `tsc --noEmit` |
+| `npm run typecheck` | `next typegen && tsc --noEmit` |
+| `npm run fixtures:media` | Generate media fixtures |
+| `npm run format:check` | Prettier check (CI) |
 | `npm test` / `npm run test:watch` | Vitest |
 | `npm run test:e2e` | Playwright |
 | `npm run build` | Production build |

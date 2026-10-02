@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [staging, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cache MongoDB binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-${{ runner.os }}-7.0.24
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run format:check
+      - name: Media fixtures
+        run: npm run fixtures:media
+      - run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          # Build-time placeholders only; runtime secrets live in Vercel (GIT_WORKFLOW.md §CI/CD).
+          MONGODB_URI: mongodb://127.0.0.1:27017/ci
+          BETTER_AUTH_SECRET: ci-build-secret-ci-build-secret-0123456
+          CRON_SECRET: ci-build-cron-secret
+          STORAGE_DRIVER: blob
+          BLOB_READ_WRITE_TOKEN: vercel_blob_rw_ci000000000000_placeholder

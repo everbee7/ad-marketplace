@@ -1,0 +1,12 @@
+node_modules
+.next
+package-lock.json
+docs
+.data
+coverage
+playwright-report
+test-results
+src/components/ui
+*.md
+.claude
+.husky

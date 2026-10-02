@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 · M0 scaffold
+- **Branch / PR:** `chore/m0-scaffold` (from `docs/design-system`) → PR into `staging`
+- **Goal:** Phase 0 foundations: runnable app, core libs, tests, CI.
+- **Done:** Next.js 16.3 app (create-next-app). shadcn radix-nova restyled to DESIGN tokens (`globals.css`, button/input/select/textarea). `env.ts`; `lib/db.ts` (one MongoClient shared by Better Auth and Mongoose); logger; errors/ActionResult; ratelimit (Mongo fixed window); storage (local + blob server side, browser upload client); email (console outbox + SMTP, React Email template); instrumentation; landing page; `/api/health`. Vitest (in-memory replica set, DB per file), Playwright config + isolated e2e server, ffmpeg fixtures, `ci.yml` + `security.yml`.
+- **Decisions:** media fixtures are generated, never committed. mongod 7.0.24 for tests. Local storage URLs are relative `/api/dev-files/...` and only our origin is accepted.
+- **Verification:** `npm run lint`, `typecheck`, `format:check`, `test` (9 passing) and `build` all green. Dev server against the user's Atlas: `/api/health` → db up. Landing screenshots at 1440 and 390 px checked against the prototype.
+- **Open / next:** merge #2 + the M0 PR; Phase 1A (M1 Accounts).
+
 ## 2026-10-02 · S4 · Delivery phases
 - **Branch / PR:** `docs/delivery-phases` → PR #3, merged
 - **Goal:** turn the flat M0–M8 milestone list into a phased plan for the whole project.
