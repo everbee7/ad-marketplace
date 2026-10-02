@@ -15,7 +15,7 @@
 > ```
 
 ## 2026-10-02 · S3 · Design system v0.1 from the Bubble prototype
-- **Branch / PR:** `docs/design-system` (not yet pushed)
+- **Branch / PR:** `docs/design-system` → PR #2 into `staging`
 - **Goal:** turn the client's two Bubble screens (landing, business portal) into design instructions.
 - **Done:** scraped both pages with headless Chrome (playwright-core in the session scratchpad, not a project dependency): screenshots + computed styles. Wrote `docs/design/DESIGN.md` v0.1 (brand, colour tokens, type scale, spacing/radii/glow, icons, components, screens, editor, a11y, client questions). Screenshots in `docs/design/reference/`. README status and ROADMAP M0 tick updated.
 - **Decisions:** dark-only MVP; blue `#4B9CD3` is the only accent (outlined + glow buttons); Helvetica display + Archivo (next/font) pairing; status/success/error colours, editor visuals and motion marked provisional. Prototype's AU / Balance blocks are not in the PRD, so not built until a PRD change.
