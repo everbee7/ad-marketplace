@@ -46,3 +46,6 @@ Thumbs.db
 
 # local dev data (db-local, local storage driver)
 .data/
+
+# generated media fixtures (npm run fixtures:media)
+tests/fixtures/media/

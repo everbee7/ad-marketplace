@@ -28,7 +28,8 @@ Last updated: 2026-10-02 · S5 (M2 business ads, Phase 1A built)
 - Client-owned Vercel team and Atlas org (Staging). SMTP credentials: Phase 1A (Staging) and 1D (Production).
 
 ## Gotchas
-- Global Mongoose `sanitizeFilter: true`: query filters with operators (`$in`, `$ne`, …) must be wrapped in `mongoose.trusted()`.
+- No global Mongoose `sanitizeFilter` (it blocks `$text`): build filters only from Zod-parsed scalars (ARCHITECTURE §9).
+- Transactions: a duplicate-key error aborts the whole transaction; check existence first and catch E11000 outside `connection.transaction()`.
 - E2E runs `next dev` (local storage driver is refused in production). First hits compile routes (5–8 s), so helpers wait for hydration (`toBeEnabled`) and for the post-login redirect; Playwright retries once.
 - `SCREENSHOTS=1 npx playwright test screens` captures checkpoint screens into `test-results/screens`.
 - The dev machine is Windows (Git Bash + PowerShell). Write tooling and hooks in Node, not bash. Use the Write/Edit tools for file content (heredocs and quoting break).

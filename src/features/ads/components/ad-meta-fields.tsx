@@ -56,7 +56,7 @@ export function AdMetaFields({
             control={control}
             name="category"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select value={field.value ?? ""} onValueChange={field.onChange}>
                 <SelectTrigger id={p.id} aria-invalid={p["aria-invalid"]} className="w-full">
                   <SelectValue placeholder="Choose a category" />
                 </SelectTrigger>

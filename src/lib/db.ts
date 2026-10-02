@@ -15,7 +15,6 @@ type Cache = { client: MongoClient; ready?: Promise<void> };
 const g = globalThis as typeof globalThis & { __flashdMongo?: Cache };
 
 mongoose.set("strictQuery", true);
-mongoose.set("sanitizeFilter", true);
 
 /**
  * Dev machines sometimes list a local resolver that refuses SRV queries (querySrv ECONNREFUSED for

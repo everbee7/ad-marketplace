@@ -194,7 +194,7 @@ FFmpeg rendering does not fit Vercel functions. The planned path is a job record
 
 ## 9. Security
 
-- Session, role and ownership are checked server-side on every mutation (§5). Zod validates every input. Mongoose `strict` mode is on and `sanitizeFilter` is applied to user-driven queries.
+- Session, role and ownership are checked server-side on every mutation (§5). Zod validates every input. Mongoose `strict` mode is on. Query filters are built only from Zod-parsed scalars (strings, enums, ObjectIds), so user input can never inject operators. The global Mongoose `sanitizeFilter` option is **not** used: it rejects `$text` and needs `trusted()` on every nested operator, which the Marketplace search depends on.
 - Upload tokens are scoped to one pre-created doc and path, with content type and size limits. `finalizeUpload` re-verifies everything and never trusts client-reported metadata for ads.
 - Rate limits (PRD §10) are enforced through `lib/ratelimit.ts`.
 - Headers in `next.config.ts`: CSP (media and images from the Blob store host), HSTS, `frame-ancestors 'none'`, `Referrer-Policy`, `Permissions-Policy`.

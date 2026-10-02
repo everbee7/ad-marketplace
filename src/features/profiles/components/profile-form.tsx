@@ -46,7 +46,7 @@ function CategorySelect({
   placeholder: string;
 }) {
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value ?? ""} onValueChange={onChange}>
       <SelectTrigger id={id} aria-invalid={invalid} className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

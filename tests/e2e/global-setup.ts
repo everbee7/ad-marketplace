@@ -6,7 +6,7 @@ import { makeFixtures } from "../../scripts/make-fixtures";
 
 import { ADMIN } from "./helpers";
 
-// Generates media fixtures and seeds the admin into the isolated E2E database started by
+// Generates media fixtures and seeds the admin + demo business with live ads into the isolated E2E database started by
 // scripts/e2e-server.mjs (its URI is written to .data/e2e.json).
 
 export default async function globalSetup() {
@@ -22,7 +22,7 @@ export default async function globalSetup() {
     [
       path.join("node_modules", "tsx", "dist", "cli.mjs"),
       "--conditions=react-server",
-      "scripts/seed-admin.ts",
+      "scripts/seed-demo.ts",
       ADMIN.email,
       ADMIN.password,
     ],

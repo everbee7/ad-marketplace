@@ -92,7 +92,35 @@ export function makeFixtures(force = false): string[] {
     execFileSync(ffmpegPath, ["-y", "-loglevel", "error", ...f.args, out], { stdio: "inherit" });
     made.push(f.file);
   }
+  // Poster frames (JPEG) for seeds and tests that need a real image.
+  for (const f of FIXTURES) {
+    const poster = path.join(FIXTURE_DIR, posterName(f.file));
+    if (!force && existsSync(poster)) continue;
+    execFileSync(
+      ffmpegPath,
+      [
+        "-y",
+        "-loglevel",
+        "error",
+        "-ss",
+        "0.1",
+        "-i",
+        path.join(FIXTURE_DIR, f.file),
+        "-frames:v",
+        "1",
+        "-q:v",
+        "4",
+        poster,
+      ],
+      { stdio: "inherit" },
+    );
+    made.push(posterName(f.file));
+  }
   return made;
+}
+
+export function posterName(file: string) {
+  return file.replace(/.[a-z0-9]+$/i, ".jpg");
 }
 
 const invokedDirectly = process.argv[1] && /make-fixtures\.[tj]s$/.test(process.argv[1]);
