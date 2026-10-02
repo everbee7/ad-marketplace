@@ -23,7 +23,7 @@ import {
 /** AUTH-04 AC1: the same confirmation whether or not the email exists. */
 export function ForgotPasswordForm() {
   const [sent, setSent] = useState(false);
-  const { form, onSubmit, pending, error } = useActionForm({
+  const { form, onSubmit, pending, error, ready } = useActionForm({
     schema: emailOnlySchema,
     defaultValues: { email: "" } as EmailOnlyInput,
     action: requestPasswordReset,
@@ -36,7 +36,7 @@ export function ForgotPasswordForm() {
       <Field label="Email" required error={form.formState.errors.email?.message}>
         {(p) => <Input {...p} type="email" autoComplete="email" {...form.register("email")} />}
       </Field>
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending || !ready} className="w-full">
         {pending && <Spinner />}
         Send reset link
       </Button>
@@ -47,7 +47,7 @@ export function ForgotPasswordForm() {
 /** AUTH-04 AC2–AC3. */
 export function ResetPasswordForm({ token }: { token: string }) {
   const [done, setDone] = useState(false);
-  const { form, onSubmit, pending, error } = useActionForm({
+  const { form, onSubmit, pending, error, ready } = useActionForm({
     schema: resetPasswordSchema,
     defaultValues: { token, password: "", confirmPassword: "" } as ResetPasswordInput,
     action: resetPassword,
@@ -107,7 +107,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           />
         )}
       </Field>
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending || !ready} className="w-full">
         {pending && <Spinner />}
         Set new password
       </Button>

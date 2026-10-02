@@ -14,3 +14,4 @@ Rules:
 | [0003](0003-video-mux.md) | Mux for video upload, processing and playback | Superseded by 0005 | 2026-10-02 |
 | [0004](0004-burst-preview-engine.md) | Client-side burst preview with preloaded MP4 clips | Accepted (amended by 0005) | 2026-10-02 |
 | [0005](0005-lean-service-stack.md) | Lean MVP service stack: Vercel + MongoDB only | Accepted | 2026-10-02 |
+| [0006](0006-ad-versioning.md) | Keep the approved ad video live while a replacement is reviewed | Accepted | 2026-10-02 |

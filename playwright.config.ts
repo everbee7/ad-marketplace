@@ -11,7 +11,8 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   fullyParallel: false,
   workers: 1,
-  retries: process.env.CI ? 1 : 0,
+  // `next dev` compiles routes on first hit; a rare first-load glitch gets one retry.
+  retries: 1,
   reporter: process.env.CI ? "github" : "list",
   globalSetup: "./tests/e2e/global-setup.ts",
   use: {

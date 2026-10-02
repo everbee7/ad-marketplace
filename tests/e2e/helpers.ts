@@ -36,6 +36,7 @@ export async function signUpAndVerify(
   email = uniqueEmail(role),
 ) {
   await page.goto(`/signup?role=${role}`);
+  await expect(page.getByRole("button", { name: "Create account" })).toBeEnabled();
   await page.getByLabel("Email").fill(email);
   await page.getByRole("textbox", { name: "Password", exact: true }).fill(PASSWORD);
   await page.getByLabel("Confirm password").fill(PASSWORD);
@@ -63,11 +64,19 @@ export async function completeCreatorOnboarding(page: Page, displayName = "Jo Cr
   await expect(page).toHaveURL(/\/creator$/);
 }
 
-export async function logIn(page: Page, email: string, password = PASSWORD) {
+export async function logIn(
+  page: Page,
+  email: string,
+  password = PASSWORD,
+  opts: { expectSuccess?: boolean } = {},
+) {
   await page.goto("/login");
+  await expect(page.getByRole("button", { name: "Log in" })).toBeEnabled();
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Log in" }).click();
+  if (opts.expectSuccess !== false)
+    await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
 }
 
 export async function logOut(page: Page) {
