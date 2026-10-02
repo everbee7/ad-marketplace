@@ -1,0 +1,63 @@
+# AGENTS.md
+
+Instructions for any AI coding agent (Claude Code, Codex, Cursor, …) working in this repo. Keep this file short; the long form lives in `docs/`.
+
+## Project
+
+**Flashd** is a web marketplace where businesses publish **burst ads** (0.5–2 s clips) and creators insert them into their own videos, preview the result in the browser, and save it as a project.
+Stack: Next.js 16 (App Router, TS strict) · MongoDB Atlas + Mongoose · Vercel · Better Auth · Mux · Tailwind v4 + shadcn/ui · Zod · Vitest + Playwright.
+
+**Status:** pre-scaffold. Docs and agent config exist; the app is not created yet (see `docs/product/ROADMAP.md`, M0).
+
+## Read before working
+
+| Need | Read |
+| --- | --- |
+| Map of all docs and which wins in a conflict | `docs/README.md` |
+| What to build, acceptance criteria | `docs/product/PRD.md` (requirement IDs like `PRJ-03`) |
+| What's done and what's next | `docs/product/ROADMAP.md` |
+| How it's built | `docs/engineering/ARCHITECTURE.md`, `DATA_MODEL.md`, `API.md` |
+| Code rules | `docs/engineering/CONVENTIONS.md` |
+| Branches, commits, PRs | `docs/engineering/GIT_WORKFLOW.md` |
+| Why a choice was made | `docs/decisions/` |
+| Visual style | `docs/design/DESIGN.md` (**not defined yet:** don't invent styles) |
+
+Read only what the task needs. Never use `docs/product/archive/` as a source.
+
+## Commands
+
+Available after M0 scaffold. `npm run check` = lint + typecheck + test.
+
+```
+npm run dev | build | lint | typecheck | test | test:e2e | check | format
+```
+
+## Workflow
+
+1. **Locate the requirement.** Find the PRD ID(s) and acceptance criteria. If the task has no ID and changes behaviour, stop and propose a PRD change first.
+2. **Explore and plan.** Read the relevant engineering docs and code. For anything beyond a small fix, state the plan (files, schema/API changes, tests) before editing.
+3. **Implement** in small steps on a `feat|fix|chore|docs/<slug>` branch cut from `staging`.
+4. **Verify.** Write or extend tests named after the requirement ID. Run `npm run check`. For UI, run the app and exercise the flow.
+5. **Update docs in the same change** (see the update rules in `docs/README.md`). Tick the requirement in ROADMAP.
+6. **Commit** with Conventional Commits that reference the PRD IDs. Open PRs into `staging` using the PR template.
+
+## Non-negotiable rules
+
+- **Security:** every Server Action, Route Handler and protected page calls `requireUser({ role })` and checks ownership server-side. `proxy.ts` is not a security boundary.
+- **Validation:** Zod schemas from `features/*/schemas.ts` on every input, shared by client and server.
+- **Video bytes never touch Vercel functions.** Browser → Mux direct upload. Images → Vercel Blob client upload.
+- **Status changes** go only through `features/*/service.ts` transition functions (PRD §9). Webhooks are idempotent and never move a status backwards.
+- **Limits and enums** come from `src/config/*`, never literals. They must match PRD §10.
+- **No raw Mongoose docs to the client.** Use `.lean()` and map to DTOs.
+- **Env vars** only through `src/env.ts`. Never read or print `.env*` secrets. Never commit them.
+- **Don't** add dependencies, change the stack, or alter schemas, endpoints or limits without updating the matching doc (and an ADR for significant choices).
+- **Don't** push to `main` or `staging`, force-push, or merge PRs unless the user explicitly asks.
+- When the PRD is ambiguous, pick the documented default (PRD §15) and note it. Don't silently invent product behaviour.
+
+## Definition of done
+
+- [ ] Acceptance criteria for the PRD ID(s) are met and covered by tests
+- [ ] `npm run check` passes, and the build succeeds
+- [ ] Loading, empty and error states handled. Keyboard accessible
+- [ ] Docs updated per `docs/README.md` rules. ROADMAP ticked
+- [ ] No secrets, no `console.log`, no `TODO` without an owner/issue (except `TODO(design)` until DESIGN.md exists)
