@@ -164,6 +164,20 @@ export async function putObject(
   return { url: res.url, pathname: res.pathname, size: body.length, contentType };
 }
 
+/** Deletes objects by storage pathname (e.g. reserved uploads that may never have been written). */
+export async function deletePathnames(pathnames: string[]): Promise<void> {
+  if (pathnames.length === 0) return;
+  if (storageDriver() === "local") {
+    await deleteObjects(pathnames.map(localUrl));
+    return;
+  }
+  try {
+    await blobDel(pathnames, { token: env.BLOB_READ_WRITE_TOKEN });
+  } catch (err) {
+    logger.warn("storage.delete failed", { count: pathnames.length }, err);
+  }
+}
+
 /** Deletes stored objects by URL. Missing objects are ignored. */
 export async function deleteObjects(urls: (string | null | undefined)[]): Promise<void> {
   const list = urls.filter((u): u is string => !!u && pathnameFromUrl(u) !== null);

@@ -17,7 +17,7 @@ import { ResendVerification } from "./resend-verification";
 
 export function SignInForm({ next }: { next?: string }) {
   const router = useRouter();
-  const { form, onSubmit, pending, error } = useActionForm({
+  const { form, onSubmit, pending, error, ready } = useActionForm({
     schema: signInSchema,
     defaultValues: { email: "", password: "", next } as SignInInput,
     action: signIn,
@@ -59,7 +59,7 @@ export function SignInForm({ next }: { next?: string }) {
           Forgot password?
         </Link>
       </div>
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending || !ready} className="w-full">
         {pending && <Spinner />}
         Log in
       </Button>

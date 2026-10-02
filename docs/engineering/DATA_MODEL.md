@@ -39,30 +39,36 @@ Indexes: `{ userId: 1 } unique`, text index on `business.companyName` (Marketpla
 | Field | Type | Notes |
 | --- | --- | --- |
 | `businessId` | ObjectId → user | |
-| `businessName` | string | Denormalised from the profile for search and cards. Updated on profile edit |
+| `businessName` / `businessLogoUrl` | string / string | null | Denormalised from the profile for search and cards. Updated on profile edit (`syncBusinessIdentity`) |
 | `title` | string | 3–100 |
-| `description` | string | ≤ 1000 |
+| `description` | string | null | ≤ 1000 |
 | `category` | enum (categories) | |
 | `tags` | string[] | ≤ 10, each ≤ 30, lowercased, deduped |
-| `status` | `uploading \| failed \| pending_review \| live \| unlisted \| rejected \| removed` | Transitions only via `features/ads/service.ts` |
-| `rejectionReason` / `removalReason` | string \| null | |
-| `video` | `VideoAsset` (below) | Currently active asset |
-| `pendingVideo` | `VideoAsset` \| null | New video under review while the old one stays live (PRD AD-05 AC2) |
-| `customThumbnailUrl` | string \| null | Optional business-chosen cover. Overrides the auto poster |
+| `status` | `uploading | failed | pending_review | live | unlisted | rejected | removed` | Transitions only via `features/ads/service.ts` (table in `features/ads/lifecycle.ts`) |
+| `inMarketplace` | boolean | **Visibility flag** ([ADR-0006](../decisions/0006-ad-versioning.md)): `live`, or `pending_review` with an approved video still active. Recomputed on every transition. Marketplace, placement and project availability use it |
+| `rejectionReason` / `removalReason` | string | null | |
+| `errorMessage` | string | null | Why the last upload failed (AD-02 AC1) |
+| `video` | `VideoAsset` | null | Currently active (approved, or first upload under review) |
+| `pendingVideo` | `VideoAsset` | null | Replacement under review while `video` stays live (AD-05 AC2, ADR-0006) |
+| `pendingUpload` | `{ videoPath, posterPath, startedAt }` | null | Pathnames reserved by `startAdUpload`; the only paths the upload routes accept |
+| `customThumbnailUrl` | string | null | Optional business-chosen cover. Overrides the auto poster |
 | `saveCount` / `projectCount` | number | Denormalised counters, updated in the same operation as the source write |
-| `submittedAt` / `approvedAt` / `removedAt` / `deletedAt` | Date \| null | |
+| `statusHistory` | `{ status, at, reason }[]` | Appended by every transition (AD-04) |
+| `submittedAt` / `approvedAt` / `removedAt` / `deletedAt` | Date | null | |
 
-`VideoAsset` = `{ url, pathname, posterUrl, sizeBytes, contentType, codec, durationSec, width, height, aspectRatio, errorMessage }`
+`VideoAsset` = `{ url, pathname, posterUrl, posterPathname, sizeBytes, contentType, codec, durationSec, width, height, aspectRatio, errorMessage }`
 - `url`/`posterUrl` come from `lib/storage.ts` (Blob, or `/api/dev-files/...` locally). `pathname` is kept so the storage object can be deleted.
 - `durationSec`/`codec` for ads are server-verified (mp4box). For creator videos they are client-reported and range-checked.
+- `aspectRatio`: `horizontal` (w/h > 1.1), `vertical` (< 0.9), else `square`.
 
 Indexes:
-- `{ status: 1, createdAt: -1, _id: -1 }`: Marketplace newest (cursor)
-- `{ status: 1, category: 1, createdAt: -1 }`: filtered listing
-- `{ status: 1, saveCount: -1, _id: -1 }`, `{ status: 1, projectCount: -1, _id: -1 }`: sorts
+- `{ inMarketplace: 1, createdAt: -1, _id: -1 }`: Marketplace newest (cursor)
+- `{ inMarketplace: 1, category: 1, createdAt: -1 }`: filtered listing
+- `{ inMarketplace: 1, saveCount: -1, _id: -1 }`, `{ inMarketplace: 1, projectCount: -1, _id: -1 }`: sorts
 - `{ businessId: 1, createdAt: -1 }`: business dashboard
+- `{ status: 1, submittedAt: 1 }`: admin review queue (oldest first)
 - `{ status: 1, updatedAt: 1 }`: cron cleanup of stale `uploading` and deleted docs
-- Text: `{ title: "text", description: "text", tags: "text", businessName: "text" }`. Upgrade path is Atlas Search
+- Text (`ad_text`): `{ title, description, tags, businessName }` with weights 5/1/3/2. Upgrade path is Atlas Search
 
 ## `creatorVideos`
 
@@ -118,7 +124,7 @@ Indexes: `{ creatorId: 1, updatedAt: -1 }`, `{ creatorVideoId: 1 }`, `{ "bursts.
 | `action` | `approve \| reject \| remove \| hide \| unhide \| resubmit` |
 | `reason` | string \| null |
 
-Index: `{ targetType: 1, targetId: 1, createdAt: -1 }`. Append-only, never updated.
+Index: `{ targetType: 1, targetId: 1, createdAt: -1 }`. Append-only, never updated. Reject reasons are stored as `"<preset>: <note>"` (ADM-02).
 
 ## `rateLimits`
 

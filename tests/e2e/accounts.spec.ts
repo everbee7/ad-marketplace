@@ -31,7 +31,13 @@ test("AUTH-01/02, PRF-01: business signs up, verifies, onboards, logs out and ba
 test("PRD §13 path 6: role guard between creator, business and admin areas", async ({ page }) => {
   await signUpAndVerify(page, "creator");
   await completeCreatorOnboarding(page);
-  for (const path of ["/business", "/business/profile", "/admin"]) {
+  for (const path of [
+    "/business",
+    "/business/profile",
+    "/business/ads/new",
+    "/admin",
+    "/admin/review",
+  ]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/creator$/);
   }
@@ -73,7 +79,7 @@ test("AUTH-01 AC2 and AUTH-03 AC1: duplicate email and unverified login", async 
   await page.getByLabel("Email").fill(fresh);
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
-  await logIn(page, fresh);
+  await logIn(page, fresh, undefined, { expectSuccess: false });
   await expect(page.getByText("Please verify your email.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Resend email" })).toBeVisible();
 });

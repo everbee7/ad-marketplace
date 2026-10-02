@@ -93,7 +93,7 @@ export function BusinessProfileForm({
   initial?: Extract<ProfileDTO, { role: "business" }>;
 }) {
   const submit = useSubmit(mode);
-  const { form, onSubmit, pending, error } = useActionForm({
+  const { form, onSubmit, pending, error, ready } = useActionForm({
     schema: businessProfileSchema,
     defaultValues: {
       role: "business",
@@ -168,7 +168,7 @@ export function BusinessProfileForm({
           />
         )}
       </Field>
-      <Button type="submit" disabled={pending} className="w-full sm:w-auto sm:self-start">
+      <Button type="submit" disabled={pending || !ready} className="w-full sm:w-auto sm:self-start">
         {pending && <Spinner />}
         {mode === "onboarding" ? "Enter the portal" : "Save profile"}
       </Button>
@@ -184,7 +184,7 @@ export function CreatorProfileForm({
   initial?: Extract<ProfileDTO, { role: "creator" }>;
 }) {
   const submit = useSubmit(mode);
-  const { form, onSubmit, pending, error } = useActionForm({
+  const { form, onSubmit, pending, error, ready } = useActionForm({
     schema: creatorProfileSchema,
     defaultValues: {
       role: "creator",
@@ -270,7 +270,7 @@ export function CreatorProfileForm({
           </Field>
         ))}
       </fieldset>
-      <Button type="submit" disabled={pending} className="w-full sm:w-auto sm:self-start">
+      <Button type="submit" disabled={pending || !ready} className="w-full sm:w-auto sm:self-start">
         {pending && <Spinner />}
         {mode === "onboarding" ? "Enter the portal" : "Save profile"}
       </Button>

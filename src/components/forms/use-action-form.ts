@@ -1,13 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import { useState, useSyncExternalStore, useTransition } from "react";
 import { useForm, type DefaultValues, type FieldValues, type Path } from "react-hook-form";
 import type { ZodType } from "zod";
 
 import type { ActionError, ActionResult } from "@/lib/errors";
 
 // React Hook Form + Zod + Server Action glue: field errors from the server land on the right input.
+
+const subscribeNoop = () => () => {};
 
 export function useActionForm<TValues extends FieldValues, TOut>(opts: {
   schema: ZodType<unknown, TValues>;
@@ -23,6 +25,12 @@ export function useActionForm<TValues extends FieldValues, TOut>(opts: {
   });
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<ActionError | null>(null);
+  // Submit stays disabled until hydration, so an early click can't trigger a native form post.
+  const ready = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
 
   const onSubmit = form.handleSubmit((values) => {
     setError(null);
@@ -43,5 +51,5 @@ export function useActionForm<TValues extends FieldValues, TOut>(opts: {
     });
   });
 
-  return { form, onSubmit, pending, error, setError };
+  return { form, onSubmit, pending, error, setError, ready };
 }

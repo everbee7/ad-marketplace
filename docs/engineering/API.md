@@ -29,9 +29,10 @@ Last updated: 2026-10-02 (lean stack, ADR-0005)
 | --- | --- | --- | --- | --- |
 | `features/auth/actions.ts` | `signUp`, `signIn`, `signOut`, `resendVerification`, `requestPasswordReset`, `resetPassword` | anonymous (signOut: any) | Better Auth limiter + login lockout; resend/reset emails 5/h/email (`authEmail`) | AUTH-01..04 |
 | `features/uploads/actions.ts` | `startImageUpload` | business / creator (onboarding allowed) | upload 20/h/user | PRF-01, AD-01 AC4 |
-| `features/uploads/actions.ts` | `startUpload`, `finalizeUpload`, `cancelUpload` | business (ad) / creator (video), owner | upload 20/h/user | AD-01/02/05, VID-01 |
+| `features/ads/actions.ts` | `startAdUpload` (new ad, or `adId` to replace), `finalizeAdUpload`, `cancelAdUpload` | business (owner) | upload 20/h/user | AD-01/02/05 |
 | `features/profiles/actions.ts` | `completeOnboarding`, `updateProfile` | business / creator | n/a | PRF-01/02 |
 | `features/ads/actions.ts` | `updateAd`, `resubmitAd`, `unlistAd`, `relistAd`, `deleteAd` | business (owner) | n/a | AD-05/06/07 |
+| `features/videos/actions.ts` | `startVideoUpload`, `finalizeVideoUpload`, `cancelVideoUpload` | creator (owner) | upload 20/h/user | VID-01 |
 | `features/marketplace/actions.ts` | `saveAd`, `unsaveAd` | creator | 120/min/user | MKT-04/05 |
 | `features/videos/actions.ts` | `renameVideo`, `deleteVideo` | creator (owner) | n/a | VID-02 |
 | `features/projects/actions.ts` | `createProject`, `updateBursts` (auto-save with `revision`), `saveProject`, `renameProject`, `duplicateProject`, `deleteProject` | creator (owner) | n/a | PRJ-* |
@@ -50,6 +51,8 @@ Upload keys: `startImageUpload`/`startUpload` return `UploadTargetDTO { driver, 
 - `ProjectEditorDTO`: `{ id, name, revision, status, video: { id, title, url, posterUrl, durationSec, aspectRatio }, bursts: { id, atSec, ad: { id, title, url, durationSec, aspectRatio, available } }[] }`
 - `UploadTargetDTO`: `{ driver: "local" | "blob", pathname, uploadKey }`
 - `ProfileDTO`: business `{ role, companyName, logoUrl, website, category, description }` | creator `{ role, displayName, avatarUrl, niche, bio, youtube, tiktok, instagram, other }`
-- `UploadStartDTO`: `{ id, videoPath, posterPath }`
+- `AdUploadStartDTO`: `{ id, video: UploadTargetDTO, poster: UploadTargetDTO }` (upload keys `ad:<id>:video|poster`)
+- `AdUploadResultDTO`: `{ id, status, errorMessage }`
+- `BusinessAdDTO` (AD-03), `AdDetailDTO` (AD-04: + description, tags, videoUrl, pendingVideoUrl, rejection/removal reason, statusHistory), `ReviewItemDTO` (ADM-02: player URL, metadata, business name/logo/email/website, `isReplacement`)
 
 Add new DTOs here when they cross the server/client boundary.

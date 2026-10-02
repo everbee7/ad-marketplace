@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 1A · M2. Business ads** (M0 scaffold and M1 accounts built; preview spike and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 1B · M3. Marketplace** (Phase 1A built: M0, M1, M2 + ADM-02; preview spike and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -84,17 +84,17 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 - [x] PRF-02 Edit profile
 
 ### M2. Business ads (≈ 2.5 d)
-- [ ] AD-01 Upload burst ad (storage adapter, upload token, finalize + server-side duration check)
-- [ ] AD-02 Processing failure & retry
-- [ ] AD-03 My ads dashboard
-- [ ] AD-04 Ad detail
-- [ ] AD-05 Edit ad
-- [ ] AD-06 Unlist / relist
-- [ ] AD-07 Delete ad
+- [x] AD-01 Upload burst ad (storage adapter, upload token, finalize + server-side duration check)
+- [x] AD-02 Processing failure & retry
+- [x] AD-03 My ads dashboard
+- [x] AD-04 Ad detail
+- [x] AD-05 Edit ad
+- [x] AD-06 Unlist / relist
+- [x] AD-07 Delete ad
 
 ### Admin, pulled forward (≈ 0.5 d)
-- [ ] ADM-02 Review queue (approve / reject with reason, moderation log)
-- [ ] Seed script: one admin account (admins are not created through sign-up)
+- [x] ADM-02 Review queue (approve / reject with reason, moderation log)
+- [x] Seed script: one admin account (admins are not created through sign-up)
 
 **Checkpoint A: client demo of the business side.** Business signs up, uploads, admin approves, ad is live. Rejection and resubmission.
 
