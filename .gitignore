@@ -29,7 +29,7 @@ blob-report/
 *.mp4
 *.mov
 *.webm
-uploads/
+/uploads/
 tmp/
 
 # claude code personal settings
