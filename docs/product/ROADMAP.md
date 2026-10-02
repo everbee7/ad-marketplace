@@ -7,17 +7,20 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**M0. Foundations** · next up: design system definition ([DESIGN.md](../design/DESIGN.md))
+**M0. Foundations** · next up: design system definition ([DESIGN.md](../design/DESIGN.md)). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Milestones
 
 ### M0. Foundations (≈ 1.5 d)
 - [x] Docs structure, PRD v1.0-draft, agent configuration (AGENTS.md, CLAUDE.md, `.claude/`)
+- [x] Session continuity (docs/ai, SessionStart/Stop hooks, `/handoff`)
+- [x] Lean service stack decided (ADR-0005)
+- [x] GitHub repo, `staging` branch, branch protection, PR template
 - [ ] Design system defined in DESIGN.md (tokens, typography, components)
 - [ ] Next.js 16 scaffold, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier/Husky
-- [ ] `src/env.ts`, `lib/db.ts`, `lib/logger.ts`, Sentry
-- [ ] GitHub repo, `staging` branch, branch protection, CI workflows, PR template
-- [ ] Vercel project (Preview/Staging/Production), Atlas clusters, Mux / Resend / Upstash accounts
+- [ ] `src/env.ts`, `lib/db.ts`, `lib/logger.ts`, `instrumentation.ts`, `lib/storage.ts` (local + blob), `lib/email.ts` (console + smtp), `lib/ratelimit.ts`, `scripts/db-local.ts`
+- [ ] CI workflows (`ci.yml`, `security.yml`) → mark them as required checks
+- [ ] Vercel project (Preview/Staging/Production, Pro plan for prod) + Blob stores, Atlas staging/prod clusters
 
 ### M1. Accounts (≈ 2 d)
 - [ ] AUTH-01 Sign up with role
@@ -29,7 +32,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 - [ ] PRF-02 Edit profile
 
 ### M2. Business ads (≈ 2.5 d)
-- [ ] AD-01 Upload burst ad (upload pipeline + Mux webhooks)
+- [ ] AD-01 Upload burst ad (storage adapter, upload token, finalize + server-side duration check)
 - [ ] AD-02 Processing failure & retry
 - [ ] AD-03 My ads dashboard
 - [ ] AD-04 Ad detail
@@ -84,8 +87,12 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 Total ≈ 17 working days (~3.5 weeks).
 
 ## Decision log (client answers)
-Record answers to [CLIENT_QUESTIONS.md](CLIENT_QUESTIONS.md) here, then fold them into the PRD. Questionnaire status: **not yet sent**.
+Record answers to [CLIENT_QUESTIONS.md](CLIENT_QUESTIONS.md) here, then fold them into the PRD. Questionnaire status: **top 5 sent 2026-10-02** (D1, C1, B1, E1, F1). Until answered, the suggested answers are in effect (PRD A7).
 
 | Client Q | PRD OQ | Answer | Date | Folded into PRD version |
 | --- | --- | --- | --- | --- |
-| | | | | |
+| D1 | OQ-2 | *Provisional:* preview only, no download | 2026-10-02 | 1.0-draft |
+| C1 | OQ-9 | *Provisional:* cut-in (video pauses) | 2026-10-02 | 1.0-draft |
+| B1 | OQ-3 | *Provisional:* 0.5–2 s | 2026-10-02 | 1.0-draft |
+| E1 | OQ-1 | *Provisional:* free use, no approval | 2026-10-02 | 1.0-draft |
+| F1 | OQ-11 | *Provisional:* no payments in MVP | 2026-10-02 | 1.0-draft |

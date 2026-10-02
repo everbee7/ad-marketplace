@@ -9,7 +9,9 @@ A marketplace connecting **businesses** and **content creators** through **burst
 
 ## Tech stack
 
-Next.js 16 (App Router, TypeScript) · MongoDB Atlas + Mongoose · Vercel · Better Auth · Mux Video · Vercel Blob · Resend · Upstash · Tailwind CSS v4 + shadcn/ui · Vitest + Playwright
+Next.js 16 (App Router, TypeScript) · MongoDB + Mongoose · Vercel (hosting, Blob storage, Cron) · Better Auth · Tailwind CSS v4 + shadcn/ui · Vitest + Playwright
+
+Only **two external platforms**, Vercel and MongoDB Atlas. Local development needs **no accounts at all** ([ADR-0005](docs/decisions/0005-lean-service-stack.md)).
 
 Details and rationale: [docs/engineering/ARCHITECTURE.md](docs/engineering/ARCHITECTURE.md), [docs/decisions/](docs/decisions/README.md).
 
@@ -17,16 +19,17 @@ Details and rationale: [docs/engineering/ARCHITECTURE.md](docs/engineering/ARCHI
 
 > Available after milestone M0 (scaffold).
 
-Prerequisites: Node.js 22+ (LTS), npm, a MongoDB Atlas dev database, Mux / Resend / Upstash dev accounts, and the Vercel CLI.
+Prerequisites: Node.js 22+ (LTS) and npm. Nothing else for local development.
 
 ```bash
 npm install
-cp .env.example .env.local   # or: vercel env pull .env.local
+cp .env.example .env.local   # local defaults: local DB, local file storage, console email
+npm run db:local             # starts a local MongoDB (data kept in .data/mongo)
 npm run seed:admin
 npm run dev                  # http://localhost:3000
 ```
 
-Mux webhooks in local development need a tunnel (e.g. `ngrok http 3000`), registered in the Mux dev environment as `<tunnel>/api/webhooks/mux`.
+Emails (verification, password reset) are printed in the terminal in local development.
 
 ## Scripts
 
@@ -51,7 +54,7 @@ Start at **[docs/README.md](docs/README.md)**, the map of all docs and how they 
 
 ## AI agents
 
-This repo is set up for AI-assisted development. [AGENTS.md](AGENTS.md) holds the shared agent rules. [CLAUDE.md](CLAUDE.md) and [.claude/](.claude/) hold the Claude Code configuration (skills, subagents, hooks, permissions).
+This repo is set up for AI-assisted development. [AGENTS.md](AGENTS.md) holds the shared agent rules. [docs/ai/](docs/ai/STATE.md) holds the session state and log, so every new session continues where the last one stopped. [CLAUDE.md](CLAUDE.md) and [.claude/](.claude/) hold the Claude Code configuration (skills, subagents, hooks, permissions).
 
 ## Contributing
 

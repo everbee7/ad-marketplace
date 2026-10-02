@@ -1,6 +1,6 @@
 # ADR-0003: Mux for video upload, processing and playback
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0005](0005-lean-service-stack.md)
 - **Date:** 2026-10-02
 - **Related:** AD-01, VID-01, PRV-01
 

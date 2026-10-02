@@ -11,10 +11,10 @@
 ## Next.js
 - Server Components by default. Add `"use client"` only for interactivity, and keep client islands small.
 - Server-only modules (`lib/*`, `models/*`, `features/*/queries.ts`, `features/*/service.ts`) start with `import "server-only"`.
-- Mutations: Server Actions using the pipeline in [ARCHITECTURE §6](ARCHITECTURE.md#6-mutation-pipeline-server-actions). Uploads, webhooks, polling: Route Handlers.
+- Mutations: Server Actions using the pipeline in [ARCHITECTURE §6](ARCHITECTURE.md#6-mutation-pipeline-server-actions). Upload tokens, search API, cron: Route Handlers.
 - Never trust `proxy.ts` for authorization. Call `requireUser()` in every action, handler and protected page.
 - Read env vars only through `src/env.ts`.
-- Use `next/image` for images. Allow Mux and Blob hosts in `next.config.ts`.
+- Use `next/image` for images. Allow the Blob store host in `next.config.ts`.
 
 ## Data
 - All DB access goes through `src/models/*` and `features/*/queries.ts|service.ts`. Pages never import models directly.
@@ -42,16 +42,17 @@
 | Layer | Tool | What to cover |
 | --- | --- | --- |
 | Unit | Vitest | Zod schemas, state transitions, `timeline.ts` (preview mapping), permission helpers, limits |
-| Integration | Vitest + `mongodb-memory-server` | Services and actions against a real Mongo. Webhook handler with recorded Mux payloads (`tests/fixtures/mux/`) |
-| E2E | Playwright | One spec per PRD §13 path, in `tests/e2e/`. Mux is mocked through fixture assets in CI. A smoke run happens against the preview URL |
+| Integration | Vitest + `mongodb-memory-server` | Services and actions against a real Mongo. Upload finalize flow with fixture clips (`tests/fixtures/media/`), incl. HEVC and out-of-range ads |
+| E2E | Playwright | One spec per PRD §13 path, in `tests/e2e/`. Media uses tiny fixture clips in `tests/fixtures/media/` and the `local` storage driver. A smoke run happens against the preview URL |
 
 - Name tests after the requirement: `describe("PRJ-03 place and adjust bursts", …)`.
 - A bug fix starts with a failing test that reproduces it.
-- Do not mock what you own. Mock only third-party network calls (Mux, Resend, Blob).
+- Do not mock what you own. Mock only what crosses the network (Vercel Blob API, SMTP). Use the `local` storage driver and `console` email in tests instead of mocks where possible.
 
 ## Commands (once scaffolded in M0)
 | Command | Purpose |
 | --- | --- |
+| `npm run db:local` | Local MongoDB (persistent `.data/mongo`, no install) |
 | `npm run dev` | Dev server |
 | `npm run lint` / `npm run lint:fix` | ESLint |
 | `npm run format` | Prettier write |

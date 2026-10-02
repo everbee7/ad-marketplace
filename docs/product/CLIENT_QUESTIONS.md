@@ -202,8 +202,8 @@ Possible extras: "your ad was approved / rejected", "a creator used your ad", a 
 
 ## L. Launch and running the product
 
-**L1 ⭐ Accounts and costs.** The product runs on a few services: website hosting (Vercel), database (MongoDB), video hosting (Mux), and email (Resend), plus small helpers.
-*Our suggestion:* they're created **in your name, with your card**, so you fully own everything. We'll guide you through setup, and most have free starting tiers.
+**L1 ⭐ Accounts and costs.** To keep things simple and affordable, the product runs on just two services: Vercel (website hosting and video/image storage) and MongoDB (database). Emails are sent from a normal email account you already have.
+*Our suggestion:* they're created **in your name, with your card**, so you fully own everything. We'll guide you through setup, and both have free starting tiers for testing. For the public launch, Vercel's paid plan (about $20/month plus usage) is required for commercial use.
 Is that OK?
 
 **L2. Do you have Terms of Service and a Privacy Policy,** or do you need them drafted for a lawyer to review? (They're needed before real users sign up.)
