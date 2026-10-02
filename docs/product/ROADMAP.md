@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 0 · M0. Foundations** · next up: design system definition ([DESIGN.md](../design/DESIGN.md)). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 0 · M0. Foundations** · next up: Next.js scaffold (design system v0.1 in [DESIGN.md](../design/DESIGN.md)). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -53,7 +53,7 @@ Phase 0 ──► 1A ──► 1B ──► 1C ──► 1D ──► launch ─
 - [x] Session continuity (docs/ai, SessionStart/Stop hooks, `/handoff`)
 - [x] Lean service stack decided (ADR-0005)
 - [x] GitHub repo, `staging` branch, branch protection, PR template
-- [ ] Design system defined in DESIGN.md (tokens, typography, components). The user drives the style choices
+- [x] Design system v0.1 defined in DESIGN.md (from the Bubble prototype; provisional items await client sign-off, DESIGN.md §10)
 - [ ] Next.js 16 scaffold, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier/Husky
 - [ ] `src/env.ts`, `lib/db.ts`, `lib/logger.ts`, `instrumentation.ts`, `lib/storage.ts` (local + blob), `lib/email.ts` (console + smtp), `lib/ratelimit.ts`, `scripts/db-local.ts`
 - [ ] CI workflows (`ci.yml`, `security.yml`) → mark them as required checks
