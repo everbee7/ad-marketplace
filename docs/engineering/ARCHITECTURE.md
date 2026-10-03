@@ -205,7 +205,7 @@ FFmpeg rendering does not fit Vercel functions. The planned path is a job record
 
 | Job | Trigger | Work |
 | --- | --- | --- |
-| `cleanup` | Vercel Cron, daily, `/api/cron/cleanup` (Bearer `CRON_SECRET`) | Mark `uploading` docs older than 24 h as failed and delete their blobs. Delete blobs of deleted, removed or failed content after a 7-day grace period |
+| `cleanup` | Vercel Cron, daily 04:00 UTC (`vercel.json`), `/api/cron/cleanup` (Bearer `CRON_SECRET`, timing-safe compare) | `features/maintenance/cleanup.ts`: uploads reserved more than 24 h ago fail (new ads/videos) or lose their reservation (replacements on existing ads), and their reserved objects are deleted. Media of deleted or removed ads is purged after a 7-day grace period, once (`ads.mediaPurgedAt`). Creator videos delete their media immediately on delete |
 
 ## 11. Environments & Deployment
 

@@ -247,3 +247,21 @@ export async function setVideoHidden(
     reason,
   });
 }
+
+// --- Cleanup job (ARCHITECTURE §10) ----------------------------------------------------------------
+
+/** Abandoned creator-video uploads older than the cutoff become failed (retry stays possible). */
+export async function expireStaleVideoUploads(olderThan: Date): Promise<number> {
+  await connectDb();
+  const stale = await CreatorVideo.find({
+    status: "uploading",
+    "pendingUpload.startedAt": { $lt: olderThan },
+    deletedAt: null,
+  }).lean<CreatorVideoDoc[]>();
+  for (const doc of stale) {
+    if (doc.pendingUpload)
+      await deletePathnames([doc.pendingUpload.videoPath, doc.pendingUpload.posterPath]);
+    await fail(doc, "The upload didn't finish within 24 hours. Please try again.");
+  }
+  return stale.length;
+}

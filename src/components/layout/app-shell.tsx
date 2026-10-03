@@ -26,6 +26,12 @@ export async function AppShell({
         : undefined;
   return (
     <div className="relative flex min-h-full flex-1 flex-col">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-surface-raised focus:px-4 focus:py-2 focus:text-[13px]"
+      >
+        Skip to content
+      </a>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,var(--primary-ambient),transparent_70%)]"
