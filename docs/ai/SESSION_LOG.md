@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M5 Projects & editor + M6 Preview (Phase 1C)
+- **Branch / PR:** `feat/m5-projects-editor` (stacked on `feat/m4-creator-videos`), one PR for Phase 1C with separate M5 / M6 commits
+- **Goal:** PRJ-01..07, PRV-01..04, and the preview spike (G3).
+- **Done:** M5: `features/projects` (pure `bursts.ts` rules, service with invariants + optimistic `revision` + transactional `ads.projectCount`, queries with read-time unavailability, actions), editor UI (`project-editor.tsx`, timeline with drag/snap/clamp/keyboard nudge, hover frame thumbnails, burst list with m:ss.s editing, swap/remove, ad picker with Saved/Marketplace tabs, 1 s auto-save + Save + leave guard, unavailable banner + one-click removal, phone layout without timeline), pages `/creator/projects`, `/new` (client-side auto-create; GET renders never mutate), `/[projectId]`. M6: `features/preview` (pure `timeline.ts`, `engine.ts` with rVFC + rAF fallback, one pre-decoded `<video>` per ad, blob preloading, `?debugPreview=1` timing log; `preview-player.tsx` with unified progress bar, burst segments, Ad label, keyboard Space/←/→/M/F, mute/volume/fullscreen, skipped-burst notice).
+- **Decisions / findings:** spike folded into the production engine; ADR-0004 updated with numbers (Chromium rVFC: offset 0–34 ms, gap 8–41 ms; rAF fallback: offset ~12 ms, gap 47–84 ms). Playwright WebKit on Windows can't decode H.264 → WebKit project only on macOS / `E2E_WEBKIT=1`; real Safari + iOS check still open. Bugs fixed while testing: iOS unlock pausing an active burst; timeline reset on every playhead render (now content-keyed); timing log only for playback-triggered cuts.
+- **Verification:** unit (timeline 10, bursts 7), integration (projects 7), Playwright: PRD §13 path 3 (incl. G3 assertions) and path 4, rAF fallback + keyboard/seek; editor screenshots reviewed (desktop + phone).
+- **Open / next:** Phase 1D: M7 Admin (ADM-01/03/04), M8 hardening + launch. Manual Safari/iOS G3 check before Checkpoint B.
+
 ## 2026-10-02 · S5 (cont.) · M4 Creator videos (Phase 1B complete)
 - **Branch / PR:** `feat/m4-creator-videos` (stacked on `feat/m3-marketplace`) → PR into `feat/m3-marketplace`
 - **Goal:** VID-01, VID-02.

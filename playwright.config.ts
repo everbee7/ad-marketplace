@@ -20,13 +20,27 @@ export default defineConfig({
     trace: "retain-on-failure",
     video: "off",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // Safari-engine run of the preview timing (G3), without requestVideoFrameCallback (rAF fallback).
+    // Playwright WebKit on Windows/Linux cannot decode H.264, so it only runs on macOS or on demand.
+    ...(process.platform === "darwin" || process.env.E2E_WEBKIT
+      ? [
+          {
+            name: "webkit",
+            use: { ...devices["Desktop Safari"] },
+            testMatch: /projects.spec.ts/,
+            grep: /path 3/,
+          },
+        ]
+      : []),
+  ],
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
         command: "node scripts/e2e-server.mjs",
         url: `${baseURL}/api/health`,
-        timeout: 240_000,
+        timeout: 600_000, // includes the production build
         reuseExistingServer: !process.env.CI,
         stdout: "pipe",
       },

@@ -10,3 +10,4 @@ src/components/ui
 *.md
 .claude
 .husky
+.next-e2e

@@ -86,3 +86,44 @@ test("no console errors on key pages", async ({ page }) => {
   }
   expect(errors).toEqual([]);
 });
+
+test("Phase 1C screens", async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await signUpAndVerify(page, "creator");
+  await completeCreatorOnboarding(page);
+  await page.goto("/marketplace?q=crunchy");
+  await page.getByRole("button", { name: "Save Crunchy Chips Burst" }).click();
+  await expect(
+    page.getByRole("button", { name: "Remove Crunchy Chips Burst from saved" }),
+  ).toBeVisible();
+  await page.goto("/creator/videos/new");
+  await expect(page.getByRole("button", { name: "Upload video" })).toBeEnabled();
+  await page.locator('input[type="file"][accept*="video"]').setInputFiles(media("video-10s.mp4"));
+  await page.getByRole("button", { name: "Upload video" }).click();
+  await expect(page).toHaveURL(/\/creator\/videos$/, { timeout: 60_000 });
+  await page.screenshot({ path: out("creator-videos"), fullPage: true });
+  await page.getByRole("link", { name: "Create project" }).click();
+  await expect(page).toHaveURL(/\/creator\/projects\/[a-f0-9]{24}$/, { timeout: 60_000 });
+  for (const at of ["0:02.0", "0:07.5"]) {
+    await page.getByRole("button", { name: "Add burst" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: /Crunchy/ })
+      .first()
+      .click();
+    await expect(page.getByRole("dialog")).toBeHidden();
+    const input = page.getByLabel("Timestamp for burst 1");
+    await input.fill(at);
+    await input.press("Enter");
+  }
+  await expect(page.getByText(/Saved · /)).toBeVisible({ timeout: 15_000 });
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: out("editor"), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: out("editor-mobile"), fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/creator/projects");
+  await page.screenshot({ path: out("projects"), fullPage: true });
+});

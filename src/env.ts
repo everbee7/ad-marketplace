@@ -26,6 +26,8 @@ const serverSchema = z
     SMTP_PASSWORD: z.string().optional(),
     CRON_SECRET: z.string().min(16),
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
+    /** E2E only: a production build (`next start`) may use the local storage driver and write the console-email outbox. Never set on Vercel. */
+    E2E_MODE: bool,
   })
   .superRefine((e, ctx) => {
     if (e.STORAGE_DRIVER === "blob" && !e.BLOB_READ_WRITE_TOKEN) {
@@ -42,7 +44,7 @@ const serverSchema = z
         message: "required when EMAIL_TRANSPORT=smtp",
       });
     }
-    if (e.NODE_ENV === "production" && e.STORAGE_DRIVER === "local") {
+    if (e.NODE_ENV === "production" && e.STORAGE_DRIVER === "local" && !e.E2E_MODE) {
       ctx.addIssue({
         code: "custom",
         path: ["STORAGE_DRIVER"],
