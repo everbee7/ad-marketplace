@@ -36,7 +36,7 @@ Last updated: 2026-10-02 (lean stack, ADR-0005)
 | `features/marketplace/actions.ts` | `saveAd`, `unsaveAd` | creator | 120/min/user | MKT-04/05 |
 | `features/videos/actions.ts` | `renameVideo`, `deleteVideo` (cascades to projects) | creator (owner) | n/a | VID-02 |
 | `features/projects/actions.ts` | `createProject` (`videoId`, optional `adId` placed at 0.0 s), `updateBursts` (auto-save; optimistic `revision`, CONFLICT on a stale tab), `saveProject`, `renameProject`, `duplicateProject`, `deleteProject` | creator (owner) | n/a | PRJ-* |
-| `features/admin/actions.ts` | `approveAd`, `rejectAd`, `removeAd`, `hideVideo`, `unhideVideo` | admin | n/a | ADM-02/03 |
+| `features/admin/actions.ts` | `approveAd`, `rejectAd` (preset reason + optional note), `removeAd` (live only, reason required), `hideVideo`, `unhideVideo` (optional reason) — all written to `moderationLogs` | admin | n/a | ADM-02/03 |
 | `features/errors/actions.ts` | `reportClientError` | any (incl. anonymous) | 30/min/IP | NFR observability |
 
 Sign-up, login, resend and password reset are thin Server Actions (Zod + `ActionResult`) over the Better Auth **server** API in `lib/auth.ts`; there is no browser auth client. Better Auth `hooks` in `lib/auth.ts` enforce the PRD rules on the raw `/api/auth/*` endpoints too: sign-up role must be business/creator, the password rule, the explicit duplicate-email message (AUTH-01 AC2), login lockout (AUTH-03 AC3) and no self-service change of `role`/`onboardingCompleted`.
@@ -58,5 +58,7 @@ Upload keys: `startImageUpload`/`startUpload` return `UploadTargetDTO { driver, 
 - `BusinessAdDTO` (AD-03), `AdDetailDTO` (AD-04: + description, tags, videoUrl, pendingVideoUrl, rejection/removal reason, statusHistory), `ReviewItemDTO` (ADM-02: player URL, metadata, business name/logo/email/website, `isReplacement`)
 
 - `CreatorVideoDTO`: `{ id, title, description, status, posterUrl, durationSec, aspectRatio, projectCount, createdAt, errorMessage, hidden }`; `CreatorVideoDetailDTO` adds `url` (null unless ready and not hidden, or viewer is admin), `width`, `height`
+
+- Admin (`features/admin/schemas.ts`): `AdminOverviewDTO` (ADM-01), `AdminAdRowDTO` / `AdminVideoRowDTO` (ADM-03, include playable URLs for admins only), `AdminUserRowDTO` (ADM-04, profile name + content counts), `Paged<T>` (`?q&status|hidden|role&page`, 25 per page). Admin list pages use plain GET forms.
 
 Add new DTOs here when they cross the server/client boundary.

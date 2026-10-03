@@ -13,7 +13,7 @@ General rules:
 
 ## Collections owned by Better Auth
 
-`user`, `session`, `account`, `verification`, `rateLimit`. Their shape is managed by Better Auth. App code reads them only through `lib/auth.ts`.
+`user`, `session`, `account`, `verification`, `rateLimit`. Their shape is managed by Better Auth. App code reads them only through `lib/auth.ts` (including the read-only admin helpers `countUsersByRole`, `searchUsers`, `usersByIds`).
 Extra user fields we add:
 
 | Field | Type | Notes |

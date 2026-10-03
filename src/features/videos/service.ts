@@ -12,6 +12,7 @@ import type { CurrentUser } from "@/lib/permissions";
 import { deleteObjects, deletePathnames, headObject, pathnameFromUrl } from "@/lib/storage";
 import { Ad } from "@/models/ad";
 import { CreatorVideo, type CreatorVideoDoc } from "@/models/creator-video";
+import { ModerationLog } from "@/models/moderation-log";
 import { Project } from "@/models/project";
 import { aspectRatioOf, toObjectId, type VideoAsset } from "@/models/shared";
 
@@ -229,12 +230,20 @@ export async function deleteVideo(
   return { deletedProjects };
 }
 
-/** ADM-03 (M7): admins hide/unhide; hidden videos can't be played by anyone but admins. */
+/** ADM-03: admins hide/unhide; hidden videos can't be played by anyone but admins (AC1). Logged. */
 export async function setVideoHidden(
   admin: CurrentUser,
   id: string,
   hidden: boolean,
+  reason: string | null = null,
 ): Promise<void> {
   const doc = await loadVideo(admin, id);
   await CreatorVideo.updateOne({ _id: doc._id }, { $set: { hiddenByAdmin: hidden } });
+  await ModerationLog.create({
+    actorId: oid(admin.id),
+    targetType: "creatorVideo",
+    targetId: doc._id,
+    action: hidden ? "hide" : "unhide",
+    reason,
+  });
 }

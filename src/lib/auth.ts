@@ -16,6 +16,7 @@ import { sendMail } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { peek, hit, reset } from "@/lib/ratelimit";
 import { passwordProblem } from "@/lib/password";
+import { escapeRegex } from "@/lib/text";
 
 // Better Auth (ADR-0002). Sessions, verification, reset and Better Auth's own IP limiter live in Mongo.
 // App rules on top (PRD AUTH-01..04) are enforced in hooks so they also cover direct calls to /api/auth/*.
@@ -144,3 +145,75 @@ export type AuthSession = typeof auth.$Infer.Session;
 
 export const VERIFY_CALLBACK = `${routes.checkEmail}/done`;
 export const RESET_CALLBACK = routes.resetPassword;
+
+// --- Read-only user queries for admin screens (DATA_MODEL: Better Auth collections are read via lib/auth) ---
+
+export type AuthUserRow = {
+  id: string;
+  email: string;
+  role: string;
+  emailVerified: boolean;
+  onboardingCompleted: boolean;
+  createdAt: Date;
+};
+
+type RawUser = {
+  _id: import("mongodb").ObjectId;
+  email: string;
+  role?: string;
+  emailVerified?: boolean;
+  onboardingCompleted?: boolean;
+  createdAt?: Date;
+};
+
+function toRow(u: RawUser): AuthUserRow {
+  return {
+    id: String(u._id),
+    email: u.email,
+    role: u.role ?? "unknown",
+    emailVerified: u.emailVerified === true,
+    onboardingCompleted: u.onboardingCompleted === true,
+    createdAt: u.createdAt ?? new Date(0),
+  };
+}
+
+export async function countUsersByRole(): Promise<Record<string, number>> {
+  const rows = await getDb()
+    .collection<RawUser>("user")
+    .aggregate<{ _id: string | null; n: number }>([{ $group: { _id: "$role", n: { $sum: 1 } } }])
+    .toArray();
+  return Object.fromEntries(rows.map((r) => [r._id ?? "unknown", r.n]));
+}
+
+export async function searchUsers(opts: {
+  email?: string;
+  role?: string;
+  page: number;
+  pageSize: number;
+}): Promise<{ rows: AuthUserRow[]; total: number }> {
+  const filter: Record<string, unknown> = {};
+  if (opts.email) filter.email = { $regex: escapeRegex(opts.email.toLowerCase()) };
+  if (opts.role) filter.role = opts.role;
+  const col = getDb().collection<RawUser>("user");
+  const [docs, total] = await Promise.all([
+    col
+      .find(filter)
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((opts.page - 1) * opts.pageSize)
+      .limit(opts.pageSize)
+      .toArray(),
+    col.countDocuments(filter),
+  ]);
+  return { rows: docs.map(toRow), total };
+}
+
+export async function usersByIds(ids: string[]): Promise<Map<string, AuthUserRow>> {
+  const { ObjectId } = await import("mongodb");
+  const valid = ids.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
+  if (valid.length === 0) return new Map();
+  const docs = await getDb()
+    .collection<RawUser>("user")
+    .find({ _id: { $in: valid } })
+    .toArray();
+  return new Map(docs.map((d) => [String(d._id), toRow(d)]));
+}
