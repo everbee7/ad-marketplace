@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 1C · M5. Projects & editor** (Phases 1A and 1B built: M0–M4 + ADM-02; preview spike and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 1D · M7. Admin** (Phases 1A–1C built: M0–M6 + ADM-02; Safari/iOS preview check and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -60,9 +60,9 @@ Phase 0 ──► 1A ──► 1B ──► 1C ──► 1D ──► launch ─
 - [ ] Vercel project (Preview + Staging) + Blob store, Atlas staging cluster. First deploy of the empty app
 
 ### Preview spike (≈ 1 d, throwaway code)
-- [ ] Standalone test page: one H.264 creator video + 3 preloaded burst clips, cut-in playback per ADR-0004
-- [ ] Measure start offset and gap at each cut on Chrome, desktop Safari and iOS Safari against G3 (±100 ms, ≤ 100 ms gap)
-- [ ] Record the numbers and the chosen approach in ADR-0004. If G3 is missed, write a new ADR with the alternative (e.g. the MSE splice rejected in ADR-0004) and raise the trade-off with the client before Phase 1C
+- [x] Spike built directly as the production engine (`features/preview`), exercised by E2E with 3 preloaded burst clips
+- [~] Measure start offset and gap at each cut: Chromium done (rVFC + rAF), desktop Safari and iOS Safari pending a real device
+- [x] Record the numbers and the chosen approach in ADR-0004. If G3 is missed, write a new ADR with the alternative (e.g. the MSE splice rejected in ADR-0004) and raise the trade-off with the client before Phase 1C
 
 The design system and the scaffold can run in parallel. The scaffold doesn't depend on styling (unstyled shadcn defaults plus `TODO(design)` until DESIGN.md is approved).
 
@@ -124,19 +124,19 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 **Exit:** E2E paths 3 and 4 are green on Staging. G3 timing is measured and meets target on Chrome, desktop Safari and iOS Safari.
 
 ### M5. Projects & editor (≈ 2.5 d)
-- [ ] PRJ-01 Create project
-- [ ] PRJ-02 Editor layout
-- [ ] PRJ-03 Place and adjust bursts
-- [ ] PRJ-04 Save (auto-save)
-- [ ] PRJ-05 Projects list
-- [ ] PRJ-06 Reopen
-- [ ] PRJ-07 Unavailable ads
+- [x] PRJ-01 Create project
+- [x] PRJ-02 Editor layout
+- [x] PRJ-03 Place and adjust bursts
+- [x] PRJ-04 Save (auto-save)
+- [x] PRJ-05 Projects list
+- [x] PRJ-06 Reopen
+- [x] PRJ-07 Unavailable ads
 
 ### M6. Preview (≈ 2 d)
-- [ ] PRV-01 Composite playback (G3 timing on Chrome + Safari + iOS), built on the spike's approach
-- [ ] PRV-02 Controls
-- [ ] PRV-03 Preview from editor
-- [ ] PRV-04 Mobile playback
+- [~] PRV-01 Composite playback (G3 met on Chromium incl. rAF fallback; Safari + iOS device check pending)
+- [x] PRV-02 Controls
+- [x] PRV-03 Preview from editor
+- [~] PRV-04 Mobile playback (playsInline + iOS gesture unlock built; needs a real-device check)
 
 **Checkpoint B: client demo of the marketplace and creator flow.** The full J2 journey, plus an unlisted ad showing as *Unavailable*.
 

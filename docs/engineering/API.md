@@ -35,7 +35,7 @@ Last updated: 2026-10-02 (lean stack, ADR-0005)
 | `features/videos/actions.ts` | `startVideoUpload` (new, or `videoId` to retry a failed one), `finalizeVideoUpload`, `cancelVideoUpload` | creator (owner) | upload 20/h/user | VID-01 (upload keys `video:<id>:video\|poster`) |
 | `features/marketplace/actions.ts` | `saveAd`, `unsaveAd` | creator | 120/min/user | MKT-04/05 |
 | `features/videos/actions.ts` | `renameVideo`, `deleteVideo` (cascades to projects) | creator (owner) | n/a | VID-02 |
-| `features/projects/actions.ts` | `createProject`, `updateBursts` (auto-save with `revision`), `saveProject`, `renameProject`, `duplicateProject`, `deleteProject` | creator (owner) | n/a | PRJ-* |
+| `features/projects/actions.ts` | `createProject` (`videoId`, optional `adId` placed at 0.0 s), `updateBursts` (auto-save; optimistic `revision`, CONFLICT on a stale tab), `saveProject`, `renameProject`, `duplicateProject`, `deleteProject` | creator (owner) | n/a | PRJ-* |
 | `features/admin/actions.ts` | `approveAd`, `rejectAd`, `removeAd`, `hideVideo`, `unhideVideo` | admin | n/a | ADM-02/03 |
 | `features/errors/actions.ts` | `reportClientError` | any (incl. anonymous) | 30/min/IP | NFR observability |
 
@@ -49,7 +49,8 @@ Upload keys: `startImageUpload`/`startUpload` return `UploadTargetDTO { driver, 
 
 - `AdCardDTO`: `{ id, title, businessName, businessLogoUrl, category, durationSec, aspectRatio, posterUrl, videoUrl, saved?: boolean, available?: boolean }` (`saved` only for creators; `available` on the Saved page)
 - `MarketplaceAdDetailDTO`: `AdCardDTO` + `{ description, tags, width, height, available, isOwner, business: { id, name, logoUrl, website, description } }`
-- `ProjectEditorDTO`: `{ id, name, revision, status, video: { id, title, url, posterUrl, durationSec, aspectRatio }, bursts: { id, atSec, ad: { id, title, url, durationSec, aspectRatio, available } }[] }`
+- `ProjectEditorDTO`: `{ id, name, revision, status, updatedAt, video: { id, title, url, posterUrl, durationSec, aspectRatio }, bursts: { id, atSec, ad: { id, title, url, posterUrl, durationSec, aspectRatio, available } }[] }` (`url`/`posterUrl` are null when the ad is unavailable)
+- `ProjectListItemDTO`: `{ id, name, videoTitle, posterUrl, burstCount, unavailableCount, status, updatedAt }`; `SaveResultDTO`: `{ revision, status, updatedAt }`
 - `UploadTargetDTO`: `{ driver: "local" | "blob", pathname, uploadKey }`
 - `ProfileDTO`: business `{ role, companyName, logoUrl, website, category, description }` | creator `{ role, displayName, avatarUrl, niche, bio, youtube, tiktok, instagram, other }`
 - `AdUploadStartDTO`: `{ id, video: UploadTargetDTO, poster: UploadTargetDTO }` (upload keys `ad:<id>:video|poster`)

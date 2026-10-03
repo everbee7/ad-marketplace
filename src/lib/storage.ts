@@ -25,7 +25,7 @@ export function storageDriver(): StorageDriver {
 }
 
 function assertLocalAllowed() {
-  if (env.NODE_ENV === "production") {
+  if (env.NODE_ENV === "production" && !env.E2E_MODE) {
     throw new Error("The local storage driver is refused in production.");
   }
 }

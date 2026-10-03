@@ -49,3 +49,4 @@ Thumbs.db
 
 # generated media fixtures (npm run fixtures:media)
 tests/fixtures/media/
+.next-e2e/

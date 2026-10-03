@@ -236,6 +236,7 @@ Variables read by `src/env.ts` (validation is lazy, so `next build` needs no run
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD` | with `smtp` | Client-owned mailbox |
 | `CRON_SECRET` | yes | ≥ 16 chars, Bearer token for `/api/cron/*` |
 | `LOG_LEVEL` | no | `debug` · `info` (default) · `warn` · `error` |
+| `E2E_MODE` | no | **E2E only.** Lets a production build use the `local` storage driver and the console-email outbox. Never set on Vercel |
 
 Dev note: outside production, `lib/db.ts` appends public DNS resolvers for `mongodb+srv` URIs, because some Windows setups list a local resolver that refuses SRV queries (`querySrv ECONNREFUSED`).
 

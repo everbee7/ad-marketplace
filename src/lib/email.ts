@@ -32,7 +32,7 @@ function smtp() {
 export async function sendMail(msg: MailMessage): Promise<void> {
   if (env.EMAIL_TRANSPORT === "console") {
     logger.info("email.console", { to: msg.to, subject: msg.subject, text: msg.text });
-    if (env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production" || env.E2E_MODE) {
       await mkdir(path.dirname(OUTBOX_FILE), { recursive: true });
       await appendFile(
         OUTBOX_FILE,

@@ -114,7 +114,8 @@ Indexes: `{ creatorId: 1, adId: 1 } unique`, `{ creatorId: 1, createdAt: -1 }`
 
 Invariants (enforced in `features/projects/service.ts` and tested):
 - `bursts` are sorted by `atSec`, and adjacent bursts are ≥ `limits.minBurstSpacingSec` apart.
-- Every `adId` was `live` **when it was placed**. Later status changes do not edit the project; unavailability is computed on read (PRJ-07).
+- Every `adId` was in the Marketplace (`inMarketplace`) **when it was placed**. Later status changes do not edit the project; unavailability is computed on read (PRJ-07). Keeping an unavailable burst in place (or moving it) is allowed; placing it anew is not.
+- `ads.projectCount` = number of non-deleted projects that use the ad (an ad used twice in one project counts once), kept in sync in the same transaction as create/updateBursts/duplicate/delete and video deletion.
 
 Indexes: `{ creatorId: 1, updatedAt: -1 }`, `{ creatorVideoId: 1 }`, `{ "bursts.adId": 1 }`
 
