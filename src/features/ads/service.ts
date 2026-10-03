@@ -389,3 +389,54 @@ export async function syncBusinessIdentity(
   await connectDb();
   await Ad.updateMany({ businessId: oid(userId) }, { $set: { businessName, businessLogoUrl } });
 }
+
+// --- Cleanup job (ARCHITECTURE §10): system actions, no user ------------------------------------
+
+const STALE_MESSAGE = "The upload didn't finish within 24 hours. Please try again.";
+
+/** Abandoned uploads: new ads → failed; replacements on existing ads → reservation dropped. */
+export async function expireStaleAdUploads(olderThan: Date): Promise<number> {
+  await connectDb();
+  const stale = await Ad.find({
+    "pendingUpload.startedAt": { $lt: olderThan },
+    deletedAt: null,
+  }).lean<Lean[]>();
+  for (const ad of stale) {
+    const p = ad.pendingUpload!;
+    await deletePathnames([p.videoPath, p.posterPath]);
+    if (ad.status === "uploading") {
+      await transition(
+        ad,
+        "failed",
+        { pendingUpload: null, errorMessage: STALE_MESSAGE },
+        STALE_MESSAGE,
+      ).catch(() => undefined);
+    } else {
+      await Ad.updateOne(
+        { _id: ad._id, "pendingUpload.startedAt": p.startedAt },
+        { $set: { pendingUpload: null } },
+      );
+    }
+  }
+  return stale.length;
+}
+
+/** Deleted or removed ads keep their media for a grace period, then it is purged once. */
+export async function purgeAdMedia(olderThan: Date): Promise<number> {
+  await connectDb();
+  const ads = await Ad.find({
+    mediaPurgedAt: null,
+    $or: [{ deletedAt: { $lt: olderThan } }, { status: "removed", removedAt: { $lt: olderThan } }],
+  }).lean<Lean[]>();
+  for (const ad of ads) {
+    await deleteObjects([
+      ad.video?.url,
+      ad.video?.posterUrl,
+      ad.pendingVideo?.url,
+      ad.pendingVideo?.posterUrl,
+      ad.customThumbnailUrl,
+    ]);
+    await Ad.updateOne({ _id: ad._id }, { $set: { mediaPurgedAt: new Date() } });
+  }
+  return ads.length;
+}

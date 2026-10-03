@@ -14,6 +14,13 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M8 Hardening
+- **Branch / PR:** `chore/m8-hardening` (stacked on `feat/m7-admin`) → PR into `feat/m7-admin`
+- **Goal:** ROADMAP M8 items that don't need client accounts.
+- **Done:** daily cleanup (`features/maintenance/cleanup.ts`, service hooks `expireStaleAdUploads` / `purgeAdMedia` / `expireStaleVideoUploads`, `/api/cron/cleanup` with timing-safe Bearer check, `vercel.json` cron, `ads.mediaPurgedAt`); `reportClientError` (rate-limited per IP) + `app/error.tsx`, `global-error.tsx`, `not-found.tsx`, an `/admin` loading skeleton (no `loading.tsx` above routes that call `notFound()`: it turns 404s into soft 404s, found by the MKT-03 E2E); skip-to-content link; `@smoke` E2E + `.github/workflows/e2e.yml` (runs on Vercel `deployment_status`); README rewritten (setup, demo logins, deployment runbook).
+- **Verification:** cleanup integration 3/3 (stale uploads, 7-day purge once, cron auth), smoke E2E 1/1, full `npm run check`.
+- **Open / next:** client inputs (Vercel/Atlas/SMTP/domain/legal copy), Staging deploy + E2E there, real-device Safari/iOS check, cross-browser QA, automated a11y audit + LCP/p95 on Staging. Then Checkpoint C.
+
 ## 2026-10-02 · S5 (cont.) · M7 Admin
 - **Branch / PR:** `feat/m7-admin` (stacked on `feat/m5-projects-editor`) → PR into `feat/m5-projects-editor`
 - **Goal:** ADM-01, ADM-03, ADM-04.

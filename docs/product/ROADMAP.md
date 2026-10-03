@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 1D · M8. Hardening & launch** (M0–M7 built; Safari/iOS preview check, Staging/Production setup and client inputs pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 1D · launch prep** (M0–M8 code complete. Waiting on: client Vercel/Atlas accounts for Staging + Production, SMTP, domain, legal copy; real-device Safari/iOS preview check; cross-browser QA). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -154,12 +154,12 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 - [x] ADM-04 Users (Should)
 
 ### M8. Hardening & launch (≈ 2 d)
-- [ ] E2E paths 1–6 (PRD §13) green on Staging
-- [ ] Cron cleanup, rate limits, security headers, CSP
-- [ ] Accessibility pass (WCAG 2.2 AA, PRD §12) and performance check (LCP, p95)
+- [~] E2E paths 1–6 (PRD §13): green locally against a production build (19 specs); Staging run pending the Staging deploy
+- [x] Cron cleanup, rate limits, security headers, CSP
+- [~] Accessibility pass (WCAG 2.2 AA, PRD §12) and performance check (LCP, p95): labels, focus ring, skip link, keyboard editor/player, reduced motion done; automated audit + LCP/p95 measurement on Staging pending
 - [ ] Cross-browser QA matrix (PRD §12)
 - [ ] Production environment: Vercel Production (Pro plan), Blob store, Atlas production cluster, domain, SMTP
-- [ ] Seed scripts, handover notes
+- [x] Seed scripts, handover notes (README: setup, demo logins, deployment runbook); error/not-found/loading states; client error reporting; `e2e.yml` smoke workflow
 - [ ] E2E paths 1–6 green on Production
 
 **Checkpoint C: launch**

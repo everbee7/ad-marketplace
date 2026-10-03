@@ -15,6 +15,8 @@
 - Never trust `proxy.ts` for authorization. Call `requireUser()` in every action, handler and protected page.
 - Read env vars only through `src/env.ts`.
 - Use `next/image` for images. Allow the Blob store host in `next.config.ts`.
+- Don't put a `loading.tsx` above routes that call `notFound()`: the boundary makes Next stream a 200 first, so the 404 becomes a soft 404 (MKT-03 AC1). Only `/admin` has one.
+- A `"use client"` module must not export helpers that server components call; put shared helpers in plain modules.
 
 ## Data
 - All DB access goes through `src/models/*` and `features/*/queries.ts|service.ts`. Pages never import models directly.

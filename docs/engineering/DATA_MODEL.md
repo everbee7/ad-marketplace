@@ -39,22 +39,23 @@ Indexes: `{ userId: 1 } unique`, text index on `business.companyName` (Marketpla
 | Field | Type | Notes |
 | --- | --- | --- |
 | `businessId` | ObjectId → user | |
-| `businessName` / `businessLogoUrl` | string / string | null | Denormalised from the profile for search and cards. Updated on profile edit (`syncBusinessIdentity`) |
+| `businessName` / `businessLogoUrl` | string / string \| null | Denormalised from the profile for search and cards. Updated on profile edit (`syncBusinessIdentity`) |
 | `title` | string | 3–100 |
-| `description` | string | null | ≤ 1000 |
+| `description` | string \| null | ≤ 1000 |
 | `category` | enum (categories) | |
 | `tags` | string[] | ≤ 10, each ≤ 30, lowercased, deduped |
-| `status` | `uploading | failed | pending_review | live | unlisted | rejected | removed` | Transitions only via `features/ads/service.ts` (table in `features/ads/lifecycle.ts`) |
+| `status` | `uploading \| failed \| pending_review \| live \| unlisted \| rejected \| removed` | Transitions only via `features/ads/service.ts` (table in `features/ads/lifecycle.ts`) |
 | `inMarketplace` | boolean | **Visibility flag** ([ADR-0006](../decisions/0006-ad-versioning.md)): `live`, or `pending_review` with an approved video still active. Recomputed on every transition. Marketplace, placement and project availability use it |
-| `rejectionReason` / `removalReason` | string | null | |
-| `errorMessage` | string | null | Why the last upload failed (AD-02 AC1) |
-| `video` | `VideoAsset` | null | Currently active (approved, or first upload under review) |
-| `pendingVideo` | `VideoAsset` | null | Replacement under review while `video` stays live (AD-05 AC2, ADR-0006) |
-| `pendingUpload` | `{ videoPath, posterPath, startedAt }` | null | Pathnames reserved by `startAdUpload`; the only paths the upload routes accept |
-| `customThumbnailUrl` | string | null | Optional business-chosen cover. Overrides the auto poster |
+| `rejectionReason` / `removalReason` | string \| null | |
+| `errorMessage` | string \| null | Why the last upload failed (AD-02 AC1) |
+| `video` | `VideoAsset` \| null | Currently active (approved, or first upload under review) |
+| `pendingVideo` | `VideoAsset` \| null | Replacement under review while `video` stays live (AD-05 AC2, ADR-0006) |
+| `pendingUpload` | `{ videoPath, posterPath, startedAt }` \| null | Pathnames reserved by `startAdUpload`; the only paths the upload routes accept |
+| `customThumbnailUrl` | string \| null | Optional business-chosen cover. Overrides the auto poster |
 | `saveCount` / `projectCount` | number | Denormalised counters, updated in the same operation as the source write |
 | `statusHistory` | `{ status, at, reason }[]` | Appended by every transition (AD-04) |
-| `submittedAt` / `approvedAt` / `removedAt` / `deletedAt` | Date | null | |
+| `submittedAt` / `approvedAt` / `removedAt` / `deletedAt` | Date \| null | |
+| `mediaPurgedAt` | Date \| null | Set by the cleanup job when storage objects of a deleted/removed ad are gone (7-day grace) |
 
 `VideoAsset` = `{ url, pathname, posterUrl, posterPathname, sizeBytes, contentType, codec, durationSec, width, height, aspectRatio, errorMessage }`
 - `url`/`posterUrl` come from `lib/storage.ts` (Blob, or `/api/dev-files/...` locally). `pathname` is kept so the storage object can be deleted.
@@ -67,7 +68,7 @@ Indexes:
 - `{ inMarketplace: 1, saveCount: -1, _id: -1 }`, `{ inMarketplace: 1, projectCount: -1, _id: -1 }`: sorts
 - `{ businessId: 1, createdAt: -1 }`: business dashboard
 - `{ status: 1, submittedAt: 1 }`: admin review queue (oldest first)
-- `{ status: 1, updatedAt: 1 }`: cron cleanup of stale `uploading` and deleted docs
+- `{ status: 1, updatedAt: 1 }`, `{ "pendingUpload.startedAt": 1 }` (sparse): cron cleanup of stale uploads and deleted docs
 - Text (`ad_text`): `{ title, description, tags, businessName }` with weights 5/1/3/2. Upgrade path is Atlas Search
 
 ## `creatorVideos`
