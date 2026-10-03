@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 1D · M7. Admin** (Phases 1A–1C built: M0–M6 + ADM-02; Safari/iOS preview check and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 1D · M8. Hardening & launch** (M0–M7 built; Safari/iOS preview check, Staging/Production setup and client inputs pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -149,9 +149,9 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 **Client inputs needed:** production domain (OQ-8), production SMTP credentials, Vercel Pro plan for Production, Atlas production cluster tier.
 
 ### M7. Admin (≈ 1 d)
-- [ ] ADM-01 Overview
-- [ ] ADM-03 Content moderation
-- [ ] ADM-04 Users (Should)
+- [x] ADM-01 Overview
+- [x] ADM-03 Content moderation
+- [x] ADM-04 Users (Should)
 
 ### M8. Hardening & launch (≈ 2 d)
 - [ ] E2E paths 1–6 (PRD §13) green on Staging

@@ -37,16 +37,10 @@ import { StateChip } from "@/features/ads/components/status-chip";
 import { limits } from "@/config/limits";
 
 import { deleteVideo, renameVideo } from "../actions";
+import { formatDuration } from "../format";
 import type { CreatorVideoDTO } from "../schemas";
 
 import { RetryVideoUpload } from "./video-upload-form";
-
-export function formatDuration(sec: number | null): string {
-  if (sec == null) return "—";
-  const m = Math.floor(sec / 60);
-  const s = Math.round(sec % 60);
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
 
 const STATE: Record<
   CreatorVideoDTO["status"],

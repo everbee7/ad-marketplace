@@ -9,7 +9,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { FormMessage } from "@/components/forms/field";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { formatDuration } from "@/features/videos/components/video-list";
+import { formatDuration } from "@/features/videos/format";
 import type { CreatorVideoDTO } from "@/features/videos/schemas";
 
 import { createProject } from "../actions";
