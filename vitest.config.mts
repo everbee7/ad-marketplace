@@ -1,14 +1,13 @@
 import path from "node:path";
 
-import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
   resolve: {
+    tsconfigPaths: true,
     alias: {
       // `server-only` throws outside the react-server condition; tests run server code directly.
-      "server-only": path.resolve(__dirname, "tests/support/empty.ts"),
+      "server-only": path.resolve(import.meta.dirname, "tests/support/empty.ts"),
     },
   },
   test: {

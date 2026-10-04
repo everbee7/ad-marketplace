@@ -7,7 +7,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done (merged to `staging
 
 ## Current focus
 
-**Phase 0 · M0. Foundations** · next up: Next.js scaffold (design system v0.1 in [DESIGN.md](../design/DESIGN.md)). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
+**Phase 1A · M2. Business ads** (M0 scaffold and M1 accounts built; preview spike and Staging deploy pending). Live status and next steps: [docs/ai/STATE.md](../ai/STATE.md)
 
 ## Phases
 
@@ -75,13 +75,13 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 **Client inputs needed:** SMTP mailbox credentials for Staging verification emails (until then Staging uses the console transport, and the demo uses a pre-verified account).
 
 ### M1. Accounts (≈ 2 d)
-- [ ] AUTH-01 Sign up with role
-- [ ] AUTH-02 Email verification
-- [ ] AUTH-03 Log in / log out
-- [ ] AUTH-04 Forgot / reset password
-- [ ] AUTH-05 Route protection
-- [ ] PRF-01 Onboarding
-- [ ] PRF-02 Edit profile
+- [x] AUTH-01 Sign up with role
+- [x] AUTH-02 Email verification
+- [x] AUTH-03 Log in / log out
+- [x] AUTH-04 Forgot / reset password
+- [x] AUTH-05 Route protection
+- [x] PRF-01 Onboarding
+- [x] PRF-02 Edit profile
 
 ### M2. Business ads (≈ 2.5 d)
 - [ ] AD-01 Upload burst ad (storage adapter, upload token, finalize + server-side duration check)

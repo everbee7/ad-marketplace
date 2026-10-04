@@ -37,6 +37,8 @@ export const limits = {
     marketplace: { max: 120, windowSec: 60 },
     save: { max: 120, windowSec: 60 },
     clientError: { max: 30, windowSec: 60 },
+    // Not in PRD §10: abuse guard for "resend verification" / "forgot password" emails.
+    authEmail: { max: 5, windowSec: 60 * 60 },
   },
   text: {
     titleMin: 3,

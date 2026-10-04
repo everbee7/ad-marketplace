@@ -2,16 +2,17 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-02 · S5 (M0 scaffold)
+Last updated: 2026-10-02 · S5 (M1 accounts)
 
 ## Where we are
 - **Phase 0 · M0:** the app is scaffolded. Next.js 16.3, React 19.2, Tailwind v4 + shadcn (radix-nova, restyled to DESIGN.md v0.1), Zod 4, Mongoose 9, Better Auth 1.7 (installed, wired in M1). Core libs: `src/env.ts`, `lib/{db,logger,errors,ratelimit,storage,storage-client,email}`, `instrumentation.ts`. Landing page, `/api/health`. Vitest + mongodb-memory-server, Playwright config + `scripts/e2e-server.mjs`, generated media fixtures, CI (`ci.yml`, `security.yml`).
+- **Phase 1A · M1 Accounts:** done on `feat/m1-accounts` (AUTH-01..05, PRF-01..02), stacked on the M0 branch. Unit/integration + Playwright accounts suite green.
 - **Open PRs:** #2 design system (conflicts resolved; the user merges it, self-merge was blocked). `chore/m0-scaffold` is cut from `docs/design-system`, so its PR contains #2's commits.
 - **Repo:** github.com/everbee7/ad-marketplace. Default branch `staging`, protected (PR required, no force-push).
 
 ## Next up (in order)
 1. Merge PR #2 and the M0 PR. Then mark `ci` + `security` as required checks.
-2. Phase 1A: M1 Accounts (Better Auth + MongoDB adapter, `proxy.ts`, onboarding), M2 Business ads, ADM-02.
+2. Phase 1A: M2 Business ads + ADM-02 (next), stacked on the M1 branch.
 3. Preview spike (Phase 0, throwaway page). G3 numbers need real Safari/iOS; Chromium/WebKit can be measured locally with Playwright.
 4. Vercel + Atlas staging (client-owned accounts).
 

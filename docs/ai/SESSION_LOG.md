@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M1 Accounts
+- **Branch / PR:** `feat/m1-accounts` (stacked on `chore/m0-scaffold`) → PR into `chore/m0-scaffold` (GitHub retargets to `staging` when #4 merges)
+- **Goal:** AUTH-01..05, PRF-01..02.
+- **Done:** `lib/auth.ts` (Better Auth + MongoDB adapter on the shared client; hooks for role/password/duplicate email/lockout/role immutability), `lib/permissions.ts` (`requireUser`, `requirePageUser`, `assertOwner`), `proxy.ts`, `lib/action.ts` (Zod + error mapping), auth pages (signup, login, verify-email + done, forgot/reset), onboarding + profile pages, `models/profile.ts`, profiles service/queries/actions, image uploads (`startImageUpload`, `/api/uploads/token`, `/api/dev-files` with Range), app shell (header, role nav, account menu), role layouts, terms/privacy placeholders, `scripts/seed-admin.ts`.
+- **Decisions:** no browser auth client (Server Actions over Better Auth server API). Single-use verification = a reused link no longer signs in. Creator `niche` uses the category list. Extra `authEmail` rate bucket (5/h/email) for resend/reset emails.
+- **Verification:** `npm run check` (23 tests incl. 9 auth + 5 profile integration), `format:check`; Playwright accounts suite 5/5 green (sign-up → verify → onboarding, role guard path 6, next param, duplicate/unverified, profile edit).
+- **Open / next:** M2 Business ads + ADM-02. Add `/admin/review` back into the path-6 E2E.
+
 ## 2026-10-02 · S5 · M0 scaffold
 - **Branch / PR:** `chore/m0-scaffold` (from `docs/design-system`) → PR into `staging`
 - **Goal:** Phase 0 foundations: runnable app, core libs, tests, CI.
