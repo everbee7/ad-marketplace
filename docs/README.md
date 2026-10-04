@@ -62,7 +62,7 @@ Agent instructions: [/AGENTS.md](../AGENTS.md) (all agents), [/CLAUDE.md](../CLA
 | [product/CLIENT_QUESTIONS.md](product/CLIENT_QUESTIONS.md) | Scope questions for the (non-technical) client | Ready to send |
 | [product/PRD.md](product/PRD.md) | Product requirements | v1.0-draft |
 | [product/ROADMAP.md](product/ROADMAP.md) | Milestones and status | Living |
-| [design/DESIGN.md](design/DESIGN.md) | Design system | **To define (next step)** |
+| [design/DESIGN.md](design/DESIGN.md) | Design system | v0.1 (from Bubble prototype; provisional parts await client sign-off) |
 | [engineering/ARCHITECTURE.md](engineering/ARCHITECTURE.md) | Technical design | Draft |
 | [engineering/DATA_MODEL.md](engineering/DATA_MODEL.md) | MongoDB schema | Draft |
 | [engineering/API.md](engineering/API.md) | Server entry points | Draft |

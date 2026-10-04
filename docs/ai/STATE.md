@@ -12,7 +12,7 @@ Last updated: 2026-10-02 · after S3
 
 ## Next up (in order, all Phase 0)
 1. Get the phase plan approved and merged.
-2. **Design system:** fill in `docs/design/DESIGN.md` together with the user (they drive style choices). Can run in parallel with step 3.
+2. Design system v0.1 is done (PR #2). Map its tokens into `src/app/globals.css` during the scaffold.
 3. **M0 scaffold:** Next.js 16 + TS strict + Tailwind v4 + shadcn, ESLint/Prettier/Husky, `src/env.ts`, `lib/*`, `scripts/db-local.ts`, Vitest, Playwright, CI workflows. Then add `ci` and `security` as required checks.
 4. **Preview spike** (≈ 1 d, throwaway): measure G3 timing on Chrome, desktop Safari and iOS Safari. Record the result in ADR-0004.
 5. **Staging deploy:** Vercel project + Blob store + Atlas staging cluster (client-owned accounts). Now needed by the end of Phase 0, because Checkpoint A is a Staging demo.
