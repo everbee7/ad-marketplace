@@ -2,6 +2,7 @@ import "server-only";
 
 import type { z } from "zod";
 
+import { syncBusinessIdentity } from "@/features/ads/service";
 import { verifyImageUrl } from "@/features/uploads/service";
 import { auth } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
@@ -14,13 +15,6 @@ import { toObjectId } from "@/models/shared";
 import type { profileSchema } from "./schemas";
 
 type ProfileData = z.output<typeof profileSchema>;
-
-/** Hooks other features register to keep denormalised fields in sync (e.g. ads.businessName). */
-type ProfileChangeListener = (userId: string, profile: ProfileDoc) => Promise<void>;
-const listeners: ProfileChangeListener[] = [];
-export function onProfileChange(listener: ProfileChangeListener) {
-  listeners.push(listener);
-}
 
 /** PRF-01 (first save) and PRF-02 (edits). Marks onboarding complete once required fields are saved. */
 export async function saveProfile(user: CurrentUser, data: ProfileData): Promise<ProfileDoc> {
@@ -85,6 +79,9 @@ export async function saveProfile(user: CurrentUser, data: ProfileData): Promise
     await ctx.internalAdapter.updateUser(user.id, { onboardingCompleted: true });
   }
   if (replacedImage) await deleteObjects([replacedImage]);
-  for (const listener of listeners) await listener(user.id, saved);
+  // PRF-02 AC1: Marketplace cards show the new name/logo straight away.
+  if (saved.business) {
+    await syncBusinessIdentity(user.id, saved.business.companyName, saved.business.logoUrl);
+  }
   return saved;
 }

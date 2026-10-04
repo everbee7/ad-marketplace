@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M2 Business ads + ADM-02 (Phase 1A complete)
+- **Branch / PR:** `feat/m2-business-ads` (stacked on `feat/m1-accounts`) → PR into `feat/m1-accounts`
+- **Goal:** AD-01..07 and ADM-02 (review queue), so PRD §13 paths 1, 2, 5 run end to end.
+- **Done:** `lib/media.ts` (mp4box probe shared by browser and server, PRD messages); `models/ad.ts`, `models/moderation-log.ts`; `features/ads` (pure `lifecycle.ts` transition table, `service.ts` as the only status writer, queries, actions, components: new-ad form, edit form, replace video, status chip with tooltip, ad card, actions bar); upload flow hook `use-media-upload.ts` + `client.ts` (browser pre-checks, decode test, canvas poster), progress panel, drop zone; `features/admin` review queue (queries, actions, panel); pages `/business` (dashboard + status filter), `/business/ads/new`, `/business/ads/[adId]`, `/business/ads/[adId]/edit`, `/admin/review`. Profile edits sync `businessName`/`businessLogoUrl` onto ads. Submit buttons stay disabled until hydration (`useActionForm().ready`).
+- **Decisions:** ADR-0006: `inMarketplace` visibility flag; a replacement video on a live ad keeps the old one visible until approval; reject hides; an invalid replacement leaves the live ad untouched. Replacing while unlisted is reviewed on relist. Reject reason stored as `"<preset>: <note>"`. Global `sanitizeFilter` means operator filters need `mongoose.trusted()`.
+- **Verification:** `npm run check` (49 tests: 17 ads integration, lifecycle, media, auth, profiles), `format:check`; Playwright 9/9 (accounts + business ads: paths 1, 2, 5, 6, HEVC/duration rejection, unlist/relist/delete). Checkpoint A screenshots reviewed (dashboard, ad detail, review queue).
+- **Open / next:** Phase 1B: M3 Marketplace, M4 Creator videos.
+
 ## 2026-10-02 · S5 (cont.) · M1 Accounts
 - **Branch / PR:** `feat/m1-accounts` (stacked on `chore/m0-scaffold`) → PR into `chore/m0-scaffold` (GitHub retargets to `staging` when #4 merges)
 - **Goal:** AUTH-01..05, PRF-01..02.

@@ -2,17 +2,17 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-02 · S5 (M1 accounts)
+Last updated: 2026-10-02 · S5 (M2 business ads, Phase 1A built)
 
 ## Where we are
 - **Phase 0 · M0:** the app is scaffolded. Next.js 16.3, React 19.2, Tailwind v4 + shadcn (radix-nova, restyled to DESIGN.md v0.1), Zod 4, Mongoose 9, Better Auth 1.7 (installed, wired in M1). Core libs: `src/env.ts`, `lib/{db,logger,errors,ratelimit,storage,storage-client,email}`, `instrumentation.ts`. Landing page, `/api/health`. Vitest + mongodb-memory-server, Playwright config + `scripts/e2e-server.mjs`, generated media fixtures, CI (`ci.yml`, `security.yml`).
-- **Phase 1A · M1 Accounts:** done on `feat/m1-accounts` (AUTH-01..05, PRF-01..02), stacked on the M0 branch. Unit/integration + Playwright accounts suite green.
+- **Phase 1A built:** M1 Accounts (`feat/m1-accounts`, PR #5) and M2 Business ads + ADM-02 (`feat/m2-business-ads`). Branches are stacked: M0 (#4) ← M1 (#5) ← M2. Checkpoint A flow works end to end locally (sign up → upload → admin approve/reject → resubmit). Staging deploy is still blocked on client accounts.
 - **Open PRs:** #2 design system (conflicts resolved; the user merges it, self-merge was blocked). `chore/m0-scaffold` is cut from `docs/design-system`, so its PR contains #2's commits.
 - **Repo:** github.com/everbee7/ad-marketplace. Default branch `staging`, protected (PR required, no force-push).
 
 ## Next up (in order)
 1. Merge PR #2 and the M0 PR. Then mark `ci` + `security` as required checks.
-2. Phase 1A: M2 Business ads + ADM-02 (next), stacked on the M1 branch.
+2. Phase 1B: M3 Marketplace (next), then M4 Creator videos. Keep stacking branches until the user merges.
 3. Preview spike (Phase 0, throwaway page). G3 numbers need real Safari/iOS; Chromium/WebKit can be measured locally with Playwright.
 4. Vercel + Atlas staging (client-owned accounts).
 
@@ -28,6 +28,9 @@ Last updated: 2026-10-02 · S5 (M1 accounts)
 - Client-owned Vercel team and Atlas org (Staging). SMTP credentials: Phase 1A (Staging) and 1D (Production).
 
 ## Gotchas
+- Global Mongoose `sanitizeFilter: true`: query filters with operators (`$in`, `$ne`, …) must be wrapped in `mongoose.trusted()`.
+- E2E runs `next dev` (local storage driver is refused in production). First hits compile routes (5–8 s), so helpers wait for hydration (`toBeEnabled`) and for the post-login redirect; Playwright retries once.
+- `SCREENSHOTS=1 npx playwright test screens` captures checkpoint screens into `test-results/screens`.
 - The dev machine is Windows (Git Bash + PowerShell). Write tooling and hooks in Node, not bash. Use the Write/Edit tools for file content (heredocs and quoting break).
 - `.env.local` points `MONGODB_URI` at an Atlas cluster (`mongodb+srv`). This machine's local DNS refuses SRV queries, so `lib/db.ts` appends public resolvers outside production (both `dns` and `dns.promises`). `npm run db:local` gives a local replica set on :27017 instead.
 - mongodb-memory-server is pinned to MongoDB 7.0.24: the 8.x Windows binary crashes with an illegal instruction (no AVX2 on this CPU).

@@ -27,7 +27,7 @@ const roleOptions: { value: SignupRole; label: string; caption: string; icon: ty
 
 export function SignUpForm({ defaultRole }: { defaultRole?: SignupRole }) {
   const router = useRouter();
-  const { form, onSubmit, pending, error } = useActionForm({
+  const { form, onSubmit, pending, error, ready } = useActionForm({
     schema: signUpSchema,
     defaultValues: {
       email: "",
@@ -148,7 +148,7 @@ export function SignUpForm({ defaultRole }: { defaultRole?: SignupRole }) {
         )}
       />
 
-      <Button type="submit" disabled={pending} className="mt-2 w-full">
+      <Button type="submit" disabled={pending || !ready} className="mt-2 w-full">
         {pending && <Spinner />}
         Create account
       </Button>
