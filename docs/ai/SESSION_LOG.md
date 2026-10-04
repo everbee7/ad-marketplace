@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-02 · S5 (cont.) · M7 Admin
+- **Branch / PR:** `feat/m7-admin` (stacked on `feat/m5-projects-editor`) → PR into `feat/m5-projects-editor`
+- **Goal:** ADM-01, ADM-03, ADM-04.
+- **Done:** admin queries in `features/admin/queries.ts` (overview counts, ads table incl. deleted, videos table, users with profile name + content counts), read-only Better Auth user helpers in `lib/auth.ts`, `lib/text.ts` (`escapeRegex`), actions `removeAd` / `hideVideo` / `unhideVideo` (logged; hide/unhide now writes `moderationLogs` too), pages `/admin` (overview), `/admin/ads`, `/admin/videos`, `/admin/users` with GET search/filter + pagination, admin media dialog.
+- **Fix found:** a server page called `formatDuration` exported from a `"use client"` module (render crash in production) → moved to `features/videos/format.ts`.
+- **Verification:** admin integration 5/5 (overview deltas, search/filter/deleted, remove only live + AC1 + log, hide/unhide + AC1 + log, users counts), Playwright admin.spec 1/1.
+- **Open / next:** M8 hardening + launch prep.
+
 ## 2026-10-02 · S5 (cont.) · M5 Projects & editor + M6 Preview (Phase 1C)
 - **Branch / PR:** `feat/m5-projects-editor` (stacked on `feat/m4-creator-videos`), one PR for Phase 1C with separate M5 / M6 commits
 - **Goal:** PRJ-01..07, PRV-01..04, and the preview spike (G3).
