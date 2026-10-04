@@ -77,12 +77,16 @@ Indexes:
 | `creatorId` | ObjectId → user | |
 | `title` | string | 3–100 |
 | `description` | string | ≤ 1000 |
-| `status` | `uploading \| ready \| failed` | |
+| `status` | `uploading \| ready \| failed` | `failed → uploading` on retry (VID-01 AC2) |
+| `errorMessage` | string \| null | Why the last upload failed |
+| `pendingUpload` | `{ videoPath, posterPath, startedAt, meta: { durationSec, width, height, codec } }` \| null | Reserved paths + client-reported facts (videos up to 2 GB are not re-read on the server; size and type are checked with `head()`) |
 | `video` | `VideoAsset` | URL is unguessable. Only rendered for the owner and admins |
 | `hiddenByAdmin` | boolean | |
 | `deletedAt` | Date \| null | |
 
-Indexes: `{ creatorId: 1, createdAt: -1 }`, `{ status: 1, updatedAt: 1 }`
+Indexes: `{ creatorId: 1, createdAt: -1 }`, `{ status: 1, updatedAt: 1 }`, text `{ title }` (admin search).
+
+Deleting a video soft-deletes its projects and decrements each placed ad's `projectCount` in one transaction (VID-02 AC1).
 
 ## `savedAds`
 

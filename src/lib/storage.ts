@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createReadStream } from "node:fs";
+import { createReadStream, createWriteStream } from "node:fs";
 import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -100,6 +100,40 @@ export async function localWrite(
   await writeFile(file, body);
   await writeFile(file + META_SUFFIX, JSON.stringify({ contentType }));
   return { url: localUrl(pathname), pathname, size: body.length, contentType };
+}
+
+/** Local driver: stream a request body to disk, aborting past maxBytes (large creator videos). */
+export async function localWriteStream(
+  pathname: string,
+  body: ReadableStream<Uint8Array>,
+  contentType: string,
+  maxBytes: number,
+): Promise<StoredObject | null> {
+  assertLocalAllowed();
+  const file = localFilePath(pathname);
+  await mkdir(path.dirname(file), { recursive: true });
+  const out = createWriteStream(file);
+  let size = 0;
+  try {
+    for await (const chunk of body as unknown as AsyncIterable<Uint8Array>) {
+      size += chunk.byteLength;
+      if (size > maxBytes) throw new Error("too large");
+      if (!out.write(chunk)) await new Promise<void>((r) => out.once("drain", () => r()));
+    }
+    await new Promise<void>((resolve, reject) =>
+      out.end((err?: Error | null) => (err ? reject(err) : resolve())),
+    );
+  } catch {
+    out.destroy();
+    await rm(file, { force: true });
+    return null;
+  }
+  if (size === 0) {
+    await rm(file, { force: true });
+    return null;
+  }
+  await writeFile(file + META_SUFFIX, JSON.stringify({ contentType }));
+  return { url: localUrl(pathname), pathname, size, contentType };
 }
 
 export async function localStat(pathname: string): Promise<StoredObject | null> {
