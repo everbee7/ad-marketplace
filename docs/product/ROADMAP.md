@@ -54,9 +54,9 @@ Phase 0 ──► 1A ──► 1B ──► 1C ──► 1D ──► launch ─
 - [x] Lean service stack decided (ADR-0005)
 - [x] GitHub repo, `staging` branch, branch protection, PR template
 - [x] Design system v0.1 defined in DESIGN.md (from the Bubble prototype; provisional items await client sign-off, DESIGN.md §10)
-- [ ] Next.js 16 scaffold, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier/Husky
-- [ ] `src/env.ts`, `lib/db.ts`, `lib/logger.ts`, `instrumentation.ts`, `lib/storage.ts` (local + blob), `lib/email.ts` (console + smtp), `lib/ratelimit.ts`, `scripts/db-local.ts`
-- [ ] CI workflows (`ci.yml`, `security.yml`) → mark them as required checks
+- [x] Next.js 16 scaffold, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier/Husky
+- [x] `src/env.ts`, `lib/db.ts`, `lib/logger.ts`, `instrumentation.ts`, `lib/storage.ts` (local + blob), `lib/email.ts` (console + smtp), `lib/ratelimit.ts`, `scripts/db-local.ts`
+- [~] CI workflows (`ci.yml`, `security.yml`) → mark them as required checks
 - [ ] Vercel project (Preview + Staging) + Blob store, Atlas staging cluster. First deploy of the empty app
 
 ### Preview spike (≈ 1 d, throwaway code)
