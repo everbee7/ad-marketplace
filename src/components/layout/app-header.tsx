@@ -57,7 +57,7 @@ export function AppHeader({
         >
           <BoltMark className="size-5" circled={false} />
         </Link>
-        <p className="page-title truncate text-center text-sm tracking-[0.18em] sm:text-[22px] sm:tracking-[0.36em]">
+        <p className="truncate text-center font-display text-sm leading-none font-bold tracking-[0.18em] uppercase sm:text-[22px] sm:tracking-[0.36em]">
           {TITLES[role]}
         </p>
         <AccountMenu email={email} displayName={displayName} role={role} />

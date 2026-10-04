@@ -48,7 +48,12 @@ test("MKT-03/04/05: detail page, optimistic save, consistent saved state", async
 
   await page.goto("/creator/saved");
   await expect(page.getByRole("link", { name: "Crunchy Chips Burst" })).toBeVisible();
+  // The card disappears optimistically; wait for the server action before reloading.
+  const unsaved = page.waitForResponse(
+    (r) => r.request().method() === "POST" && r.url().includes("/creator/saved"),
+  );
   await page.getByRole("button", { name: "Remove Crunchy Chips Burst from saved" }).click();
+  await unsaved;
   await expect(page.getByRole("link", { name: "Crunchy Chips Burst" })).toBeHidden();
   await page.reload();
   await expect(page.getByText("No saved ads yet")).toBeVisible();

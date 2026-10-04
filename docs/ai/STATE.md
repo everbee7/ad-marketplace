@@ -2,18 +2,19 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-02 · S5 (M4 creator videos, Phase 1B built)
+Last updated: 2026-10-02 · S5 (Phase 1C: editor + preview)
 
 ## Where we are
 - **Phase 0 · M0:** the app is scaffolded. Next.js 16.3, React 19.2, Tailwind v4 + shadcn (radix-nova, restyled to DESIGN.md v0.1), Zod 4, Mongoose 9, Better Auth 1.7 (installed, wired in M1). Core libs: `src/env.ts`, `lib/{db,logger,errors,ratelimit,storage,storage-client,email}`, `instrumentation.ts`. Landing page, `/api/health`. Vitest + mongodb-memory-server, Playwright config + `scripts/e2e-server.mjs`, generated media fixtures, CI (`ci.yml`, `security.yml`).
-- **Phases 1A + 1B built:** M1 Accounts (#5), M2 Business ads + ADM-02 (#6), M3 Marketplace (#7), M4 Creator videos (branch `feat/m4-creator-videos`). Stacked PR chain: #4 (M0) ← #5 ← #6 ← #7 ← M4. Merge from the bottom; GitHub retargets each PR to `staging` as its base merges.
+- **Phases 1A–1C built:** M1 Accounts (#5), M2 Business ads + ADM-02 (#6), M3 Marketplace (#7), M4 Creator videos (#8), M5 Projects & editor + M6 Preview (branch `feat/m5-projects-editor`). Stacked PR chain: #4 (M0) ← #5 ← #6 ← #7 ← #8 ← 1C. Merge from the bottom; GitHub retargets each PR to `staging` as its base merges.
+- **Preview G3:** met on Chromium (rVFC and rAF fallback), numbers in ADR-0004. **Not yet measured on real Safari / iPhone**: open the editor with `?debugPreview=1`, play, read `window.__flashdPreviewLog`.
 - **Open PRs:** #2 design system (conflicts resolved; the user merges it, self-merge was blocked). `chore/m0-scaffold` is cut from `docs/design-system`, so its PR contains #2's commits.
 - **Repo:** github.com/everbee7/ad-marketplace. Default branch `staging`, protected (PR required, no force-push).
 
 ## Next up (in order)
 1. Merge PR #2 and the M0 PR. Then mark `ci` + `security` as required checks.
-2. Phase 1C: M5 Projects & editor (next), then M6 Preview. Do the preview spike first (it informs M6). Keep stacking branches until the user merges.
-3. Preview spike (Phase 0, throwaway page). G3 numbers need real Safari/iOS; Chromium/WebKit can be measured locally with Playwright.
+2. Phase 1D: M7 Admin (ADM-01, ADM-03, ADM-04), then M8 hardening (cron cleanup, error reporting, error/loading states, a11y + perf pass, handover). Keep stacking branches until the user merges.
+3. Manual Safari + iOS check of the preview (G3, PRV-04) on a real device.
 4. Vercel + Atlas staging (client-owned accounts).
 
 ## Active assumptions (provisional until the client answers)
@@ -28,6 +29,8 @@ Last updated: 2026-10-02 · S5 (M4 creator videos, Phase 1B built)
 - Client-owned Vercel team and Atlas org (Staging). SMTP credentials: Phase 1A (Staging) and 1D (Production).
 
 ## Gotchas
+- Playwright Chromium here plays H.264/AAC and has rVFC; Playwright WebKit on Windows reports H.264 as playable but fails to decode it (MEDIA_ERR_SRC_NOT_SUPPORTED).
+- Editor E2E: a new burst lands at the nearest free slot to the playhead and the list re-sorts, so tests must address the row where it lands; wait for the picker dialog to close before typing (focus returns to Add burst).
 - No global Mongoose `sanitizeFilter` (it blocks `$text`): build filters only from Zod-parsed scalars (ARCHITECTURE §9).
 - Transactions: a duplicate-key error aborts the whole transaction; check existence first and catch E11000 outside `connection.transaction()`.
 - E2E runs `next dev` (local storage driver is refused in production). First hits compile routes (5–8 s), so helpers wait for hydration (`toBeEnabled`) and for the post-login redirect; Playwright retries once.

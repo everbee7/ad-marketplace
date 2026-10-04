@@ -30,6 +30,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // E2E builds into their own folder so they never clash with a running `next dev`.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   typedRoutes: false,
   serverExternalPackages: ["mongodb-memory-server", "ffmpeg-static"],

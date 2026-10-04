@@ -43,7 +43,7 @@
 | --- | --- | --- |
 | Unit | Vitest | Zod schemas, state transitions, `timeline.ts` (preview mapping), permission helpers, limits |
 | Integration | Vitest + `mongodb-memory-server` | Services and actions against a real Mongo. Upload finalize flow with fixture clips (`tests/fixtures/media/`), incl. HEVC and out-of-range ads |
-| E2E | Playwright | One spec per PRD §13 path, in `tests/e2e/`. Media uses tiny fixture clips in `tests/fixtures/media/` and the `local` storage driver. `scripts/e2e-server.mjs` starts an in-memory MongoDB + `next dev` on :3100 so E2E never touches the dev database. A smoke run happens against the preview URL |
+| E2E | Playwright | One spec per PRD §13 path, in `tests/e2e/`. Media uses tiny fixture clips in `tests/fixtures/media/` and the `local` storage driver. `scripts/e2e-server.mjs` starts an in-memory MongoDB and a **production build** (`next build` into `.next-e2e`, then `next start` on :3100, `E2E_MODE=1`) so E2E never touches the dev database and isn't skewed by on-demand compilation (`E2E_DEV=1` uses `next dev` instead). Global setup runs `scripts/seed-demo.ts` (admin + demo business with 4 live ads). A smoke run happens against the preview URL |
 
 - **Media fixtures are generated, never committed** (`.gitignore` + `security.yml`): `npm run fixtures:media` uses `ffmpeg-static` to create H.264, HEVC, VP9 and out-of-range clips in `tests/fixtures/media/`.
 - `mongodb-memory-server` is pinned to MongoDB **7.0.24** (`package.json` → `config.mongodbMemoryServer`): the 8.x Windows binary crashes with an illegal-instruction error on CPUs without AVX2.
