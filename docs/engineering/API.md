@@ -18,7 +18,7 @@ Last updated: 2026-10-02 (lean stack, ADR-0005)
 | --- | --- | --- | --- | --- | --- | --- |
 | * | `/api/auth/[...all]` | n/a | Better Auth limiter + login 5/15 min/email | Better Auth handler | n/a | AUTH-* |
 | POST | `/api/uploads/token` | owner of the pending doc (videos) / signed-in (profile images) | 60/h/user | Vercel Blob client-upload handshake. Path, content type and size are restricted per kind | Blob protocol | AD-01, VID-01, PRF-01 |
-| GET | `/api/marketplace` | signed-in | 120/min/user | Search, filter and page live ads | `?q&category[]&duration&aspect&sort&cursor` → `{ items: AdCardDTO[], nextCursor }` | MKT-01/02 |
+| GET | `/api/marketplace` | signed-in | 120/min/user | Search, filter and page live ads (24/page, keyset cursor) | `?q&category=…(repeatable)&duration=short\|medium\|long&aspect=vertical\|horizontal\|square&sort=newest\|most_saved\|most_used&cursor` → `{ items: AdCardDTO[], nextCursor }` | MKT-01/02 |
 | GET | `/api/health` | none | n/a | Liveness + DB ping (Playwright, uptime checks) | → `{ ok, db }` | NFR reliability |
 | GET | `/api/cron/cleanup` | `Bearer CRON_SECRET` | n/a | Daily cleanup | → `{ stats }` | NFR reliability |
 | PUT/GET | `/api/dev-files/[...path]` | signed-in, **development only** | n/a | Local storage driver: write and serve files in `.data/uploads` | raw bytes | n/a |
@@ -47,7 +47,8 @@ Upload keys: `startImageUpload`/`startUpload` return `UploadTargetDTO { driver, 
 
 ## DTOs (in `features/*/schemas.ts`)
 
-- `AdCardDTO`: `{ id, title, businessName, businessLogoUrl, category, durationSec, aspectRatio, posterUrl, videoUrl, saved?: boolean }`
+- `AdCardDTO`: `{ id, title, businessName, businessLogoUrl, category, durationSec, aspectRatio, posterUrl, videoUrl, saved?: boolean, available?: boolean }` (`saved` only for creators; `available` on the Saved page)
+- `MarketplaceAdDetailDTO`: `AdCardDTO` + `{ description, tags, width, height, available, isOwner, business: { id, name, logoUrl, website, description } }`
 - `ProjectEditorDTO`: `{ id, name, revision, status, video: { id, title, url, posterUrl, durationSec, aspectRatio }, bursts: { id, atSec, ad: { id, title, url, durationSec, aspectRatio, available } }[] }`
 - `UploadTargetDTO`: `{ driver: "local" | "blob", pathname, uploadKey }`
 - `ProfileDTO`: business `{ role, companyName, logoUrl, website, category, description }` | creator `{ role, displayName, avatarUrl, niche, bio, youtube, tiktok, instagram, other }`

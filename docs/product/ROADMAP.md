@@ -106,11 +106,11 @@ The design system and the scaffold can run in parallel. The scaffold doesn't dep
 **Exit:** a creator can search, save ads and upload a video on Staging. The creator half of path 6 is green.
 
 ### M3. Marketplace (≈ 2 d)
-- [ ] MKT-01 Browse
-- [ ] MKT-02 Search, filter, sort
-- [ ] MKT-03 Ad detail page
-- [ ] MKT-04 Save / unsave
-- [ ] MKT-05 Saved ads page
+- [x] MKT-01 Browse
+- [x] MKT-02 Search, filter, sort
+- [x] MKT-03 Ad detail page
+- [x] MKT-04 Save / unsave
+- [x] MKT-05 Saved ads page
 
 ### M4. Creator videos (≈ 1 d)
 - [ ] VID-01 Upload video (signed playback)
