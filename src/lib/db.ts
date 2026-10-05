@@ -18,13 +18,21 @@ mongoose.set("strictQuery", true);
 
 /**
  * Dev machines sometimes list a local resolver that refuses SRV queries (querySrv ECONNREFUSED for
- * mongodb+srv URIs). Outside production, append public resolvers as a fallback.
+ * mongodb+srv URIs). Append MONGODB_DNS_SERVERS (or public resolvers in development) as a fallback.
  */
 function devSrvDnsFallback(uri: string) {
-  if (env.NODE_ENV === "production" || !uri.startsWith("mongodb+srv://")) return;
+  if (!uri.startsWith("mongodb+srv://")) return;
+  const extra = env.MONGODB_DNS_SERVERS
+    ? env.MONGODB_DNS_SERVERS.split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : env.NODE_ENV === "production"
+      ? []
+      : ["1.1.1.1", "8.8.8.8"];
+  if (extra.length === 0) return;
   for (const resolver of [dns, dns.promises]) {
     const servers = resolver.getServers();
-    if (!servers.includes("1.1.1.1")) resolver.setServers([...servers, "1.1.1.1", "8.8.8.8"]);
+    resolver.setServers([...servers, ...extra.filter((s) => !servers.includes(s))]);
   }
 }
 

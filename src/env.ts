@@ -28,6 +28,12 @@ const serverSchema = z
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
     /** E2E only: a production build (`next start`) may use the local storage driver and write the console-email outbox. Never set on Vercel. */
     E2E_MODE: bool,
+    /** Folder for the local storage driver (ADR-0007). Defaults to <app>/.data/uploads. */
+    STORAGE_LOCAL_DIR: z.string().min(1).optional(),
+    /** Extra DNS servers for mongodb+srv lookups, comma-separated (hosts whose resolver refuses SRV). */
+    MONGODB_DNS_SERVERS: z.string().optional(),
+    /** Set by Vercel itself. Used only to refuse the local storage driver there (ephemeral disk). */
+    VERCEL: z.string().optional(),
   })
   .superRefine((e, ctx) => {
     if (e.STORAGE_DRIVER === "blob" && !e.BLOB_READ_WRITE_TOKEN) {
@@ -44,11 +50,11 @@ const serverSchema = z
         message: "required when EMAIL_TRANSPORT=smtp",
       });
     }
-    if (e.NODE_ENV === "production" && e.STORAGE_DRIVER === "local" && !e.E2E_MODE) {
+    if (e.VERCEL && e.STORAGE_DRIVER === "local") {
       ctx.addIssue({
         code: "custom",
         path: ["STORAGE_DRIVER"],
-        message: "local driver is refused in production",
+        message: "the local driver is refused on Vercel (ephemeral disk); use blob",
       });
     }
   });

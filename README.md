@@ -5,7 +5,7 @@ A marketplace connecting **businesses** and **content creators** through **burst
 - Businesses upload burst ads. An admin reviews them, and approved ads go live in a shared Marketplace.
 - Creators browse and save ads, upload videos, place bursts on a timeline, preview the combined video in the browser, and save projects.
 
-> **Status:** MVP feature-complete (M0–M7) with hardening (M8) in progress. Not deployed yet. See [docs/product/ROADMAP.md](docs/product/ROADMAP.md) and [docs/ai/STATE.md](docs/ai/STATE.md).
+> **Status:** MVP feature-complete (M0–M8), merged into `staging`, self-hosted on the client's Windows Server (ADR-0007). See [docs/product/ROADMAP.md](docs/product/ROADMAP.md) and [docs/ai/STATE.md](docs/ai/STATE.md).
 
 ## Tech stack
 
@@ -44,7 +44,33 @@ npm run dev                     # http://localhost:3000
 | `npm run seed:admin -- <email> <password>` | Create an admin (admins can't sign up) |
 | `npm run seed:demo -- [adminEmail] [adminPassword]` | Admin + demo business with approved ads |
 
-## Deploying (Vercel + MongoDB Atlas)
+## Deploying on Windows Server (current, ADR-0007)
+
+Production runs on the client's Windows Server 2025 (`68.168.20.36`, HTTP on port 80 until a domain exists).
+
+| What | Where |
+| --- | --- |
+| App (git clone of `staging`) | `C:\flashd\app` |
+| Settings (secrets; admins only) | `C:\flashd-data\config\flashd.env` |
+| Uploaded media | `C:\flashd-data\uploads` |
+| Logs | `C:\flashd-data\logs\flashd.out.log` / `flashd.err.log` (also where console emails appear) |
+| Windows service | `Flashd` (NSSM) → `node scripts/ops/serve.mjs` |
+| Daily cleanup | Task Scheduler `Flashd cleanup` → `node scripts/ops/cron-cleanup.mjs` (04:00) |
+
+Common tasks (PowerShell as Administrator):
+
+```powershell
+cd C:\flashd\app
+node scripts/ops/deploy.mjs staging         # pull, npm ci, build, restart
+nssm restart Flashd                          # restart only
+nssm status Flashd
+Get-Content C:\flashd-data\logs\flashd.out.log -Tail 50 -Wait
+node scripts/ops/with-env.mjs npx tsx --conditions=react-server scripts/seed-admin.ts <email> <password>
+```
+
+Before real users: add a domain + HTTPS (e.g. Caddy in front of the app), SMTP settings (`EMAIL_TRANSPORT=smtp`, `SMTP_*`), and more disk for `STORAGE_LOCAL_DIR`.
+
+## Deploying on Vercel + MongoDB Atlas (alternative)
 
 Everything is owned by the client: a Vercel team (Pro plan for Production) and a MongoDB Atlas organisation.
 
