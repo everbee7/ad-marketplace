@@ -61,7 +61,7 @@ Common tasks (PowerShell as Administrator):
 
 ```powershell
 cd C:\flashd\app
-node scripts/ops/deploy.mjs staging         # pull, npm ci, build, restart
+node scripts/ops/deploy.mjs staging         # pull, stop service, npm ci, build, start (a few minutes of downtime)
 nssm restart Flashd                          # restart only
 nssm status Flashd
 Get-Content C:\flashd-data\logs\flashd.out.log -Tail 50 -Wait

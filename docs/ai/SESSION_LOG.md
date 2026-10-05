@@ -20,6 +20,7 @@
 - **Done:** ADR-0007; local storage allowed except on Vercel, `STORAGE_LOCAL_DIR`, `MONGODB_DNS_SERVERS`; `scripts/ops/` (serve, with-env, cron-cleanup, deploy, env-file). Server: NSSM (winget) → service `Flashd` on port 80 from `C:\flashd\app`, settings `C:\flashd-data\config\flashd.env` (generated secrets; Mongo URI copied from `.env.local` by a script with db `flashd_prod`, never printed), firewall rule TCP 80, scheduled task `Flashd cleanup`, admin seeded.
 - **Decisions (user):** IP-only HTTP, existing Atlas cluster, console email for now, media on C:, no Atlas IP restriction for now.
 - **Verification:** `/api/health` → db up via 68.168.20.36; `/`, `/login`, `/signup` 200, `/marketplace` 307 → login; cron 401 without secret, 200 with it; admin sign-in 200 and `/admin` 200 over HTTP.
+- **Fix found:** the first `deploy.mjs` run failed with EPERM in `npm ci` because the running service locks `next-swc.win32-x64-msvc.node`; the script now stops the service before installing and starts it after the build (#14), and calls `C:\flashd\bin\nssm.exe` directly.
 - **Open / next:** HTTPS + domain, SMTP, disk space, Atlas IP allow-list.
 
 ## 2026-10-04 · S6 · Merge the PR chain, stop local servers
