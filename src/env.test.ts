@@ -16,11 +16,11 @@ describe("env: storage driver rules", () => {
     Object.assign(process.env, {
       NODE_ENV: "production",
       STORAGE_DRIVER: "local",
-      STORAGE_LOCAL_DIR: "C:\\flashd-data\\uploads",
+      STORAGE_LOCAL_DIR: "D:\\media\\uploads",
     });
     resetEnvCache();
     expect(env.STORAGE_DRIVER).toBe("local");
-    expect(env.STORAGE_LOCAL_DIR).toBe("C:\\flashd-data\\uploads");
+    expect(env.STORAGE_LOCAL_DIR).toBe("D:\\media\\uploads");
   });
 
   it("refuses the local driver on Vercel and names the variable, not its value", () => {

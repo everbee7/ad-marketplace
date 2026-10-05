@@ -1,31 +1,10 @@
-// Self-hosted ops (ADR-0007): production settings live in a plain KEY=VALUE file outside the repo,
-// by default C:\flashd-data\config\flashd.env (override with FLASHD_ENV_FILE).
+// Self-hosted ops (ADR-0007): production settings live in the repo's gitignored
+// .env.production.local, loaded the same way Next loads them for `next build` / `next start`.
 
-import { readFileSync } from "node:fs";
+import nextEnv from "@next/env";
 
-export const ENV_FILE = process.env.FLASHD_ENV_FILE ?? "C:\\flashd-data\\config\\flashd.env";
-
-/** Parses KEY=VALUE lines (# comments, optional surrounding quotes). Never logs values. */
-export function loadEnvFile(file = ENV_FILE) {
-  const out = {};
-  for (const raw of readFileSync(file, "utf8").split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith("#")) continue;
-    const eq = line.indexOf("=");
-    if (eq < 1) continue;
-    const key = line.slice(0, eq).trim();
-    let value = line.slice(eq + 1).trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-    out[key] = value;
-  }
-  return out;
-}
-
+/** Returns process.env plus the production .env files (.env.production.local wins). */
 export function productionEnv() {
-  return { ...process.env, ...loadEnvFile(), NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1" };
+  const { combinedEnv } = nextEnv.loadEnvConfig(process.cwd(), false, { info() {}, error() {} });
+  return { ...combinedEnv, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1" };
 }

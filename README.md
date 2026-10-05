@@ -48,27 +48,40 @@ npm run dev                     # http://localhost:3000
 
 Production runs on the client's Windows Server 2025 (`68.168.20.36`, HTTP on port 80 until a domain exists).
 
+The app runs from this repo folder: nginx (port 80) → pm2 → `next start` on `127.0.0.1:3001`.
+
 | What | Where |
 | --- | --- |
-| App (git clone of `staging`) | `C:\flashd\app` |
-| Settings (secrets; admins only) | `C:\flashd-data\config\flashd.env` |
-| Uploaded media | `C:\flashd-data\uploads` |
-| Logs | `C:\flashd-data\logs\flashd.out.log` / `flashd.err.log` (also where console emails appear) |
-| Windows service | `Flashd` (NSSM) → `node scripts/ops/serve.mjs` |
-| Daily cleanup | Task Scheduler `Flashd cleanup` → `node scripts/ops/cron-cleanup.mjs` (04:00) |
+| App | this repo folder (`C:\Users\Administrator\Documents\ad-marketplace`) |
+| Settings (secrets) | `.env.production.local` (gitignored; Next loads it for build/start, over `.env.local`) |
+| Processes | pm2 ([ecosystem.config.cjs](ecosystem.config.cjs)): `flashd-web`, `flashd-cleanup` (daily 04:00), `nginx`. `PM2_HOME=C:\ProgramData\pm2` |
+| Reverse proxy | nginx in `C:\nginx`, config [ops/nginx/nginx.conf](ops/nginx/nginx.conf) |
+| Start at boot | Task Scheduler `Flashd pm2` → `pm2 resurrect` (SYSTEM) |
+| Network | Windows Firewall: inbound TCP 80 only; the app port is localhost-only |
+| Uploaded media | `.data/uploads` |
+| Logs | `.data/logs/web.out.log` / `web.err.log` (console emails appear here), `cleanup.log`, nginx in `C:\nginx\logs` |
 
-Common tasks (PowerShell as Administrator):
+First-time setup on a fresh server (PowerShell as Administrator, in the repo folder):
 
 ```powershell
-cd C:\flashd\app
-node scripts/ops/deploy.mjs staging         # pull, stop service, npm ci, build, start (a few minutes of downtime)
-nssm restart Flashd                          # restart only
-nssm status Flashd
-Get-Content C:\flashd-data\logs\flashd.out.log -Tail 50 -Wait
+npm i -g pm2                                                      # nginx: unzip nginx.org's Windows build to C:\nginx
+powershell -ExecutionPolicy Bypass -File scripts\ops\register-boot.ps1   # PM2_HOME, boot task, firewall 80
+# create .env.production.local (MONGODB_URI, BETTER_AUTH_SECRET, CRON_SECRET, NEXT_PUBLIC_APP_URL=http://<ip>, ...)
+node scripts/ops/deploy.mjs staging
+```
+
+Common tasks:
+
+```powershell
+node scripts/ops/deploy.mjs staging         # pull, stop app, npm ci if the lockfile changed, build, start (a few minutes of downtime)
+pm2 ls                                       # status
+pm2 restart flashd-web                       # restart the app (after editing .env.production.local; rebuild if NEXT_PUBLIC_* changed)
+pm2 restart nginx                            # after editing ops/nginx/nginx.conf (test first: C:\nginx\nginx.exe -p C:\nginx\ -c ops\nginx\nginx.conf -t)
+pm2 logs flashd-web
 node scripts/ops/with-env.mjs npx tsx --conditions=react-server scripts/seed-admin.ts <email> <password>
 ```
 
-Before real users: add a domain + HTTPS (e.g. Caddy in front of the app), SMTP settings (`EMAIL_TRANSPORT=smtp`, `SMTP_*`), and more disk for `STORAGE_LOCAL_DIR`.
+Before real users: add a domain + HTTPS (a 443 server block in `ops/nginx/nginx.conf`), SMTP settings (`EMAIL_TRANSPORT=smtp`, `SMTP_*`), and more disk for `STORAGE_LOCAL_DIR`.
 
 ## Deploying on Vercel + MongoDB Atlas (alternative)
 
