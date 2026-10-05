@@ -17,7 +17,10 @@ import { logger } from "@/lib/logger";
 export type StorageDriver = "local" | "blob";
 export type StoredObject = { url: string; pathname: string; size: number; contentType: string };
 
-export const LOCAL_ROOT = path.join(process.cwd(), ".data", "uploads");
+/** Root folder of the local driver: STORAGE_LOCAL_DIR, or <app>/.data/uploads (ADR-0007). */
+export function localRoot(): string {
+  return path.resolve(env.STORAGE_LOCAL_DIR ?? path.join(process.cwd(), ".data", "uploads"));
+}
 export const LOCAL_URL_PREFIX = "/api/dev-files/";
 
 export function storageDriver(): StorageDriver {
@@ -25,8 +28,8 @@ export function storageDriver(): StorageDriver {
 }
 
 function assertLocalAllowed() {
-  if (env.NODE_ENV === "production" && !env.E2E_MODE) {
-    throw new Error("The local storage driver is refused in production.");
+  if (env.VERCEL) {
+    throw new Error("The local storage driver is refused on Vercel (ephemeral disk).");
   }
 }
 
@@ -43,8 +46,9 @@ export function localFilePath(pathname: string): string {
   if (!/^[a-zA-Z0-9/_.-]+$/.test(clean) || clean.split("/").some((s) => s === ".." || s === "")) {
     throw new Error("Invalid storage pathname");
   }
-  const full = path.join(LOCAL_ROOT, clean);
-  if (!full.startsWith(LOCAL_ROOT + path.sep)) throw new Error("Invalid storage pathname");
+  const root = localRoot();
+  const full = path.join(root, clean);
+  if (!full.startsWith(root + path.sep)) throw new Error("Invalid storage pathname");
   return full;
 }
 

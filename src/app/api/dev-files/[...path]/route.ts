@@ -15,7 +15,7 @@ import { localStat, localStream, localWriteStream } from "@/lib/storage";
 export const dynamic = "force-dynamic";
 
 function devOnly() {
-  if ((env.NODE_ENV === "production" && !env.E2E_MODE) || env.STORAGE_DRIVER !== "local") {
+  if (env.VERCEL || env.STORAGE_DRIVER !== "local") {
     return NextResponse.json(
       { error: { code: "NOT_FOUND", message: "Not found." } },
       { status: 404 },

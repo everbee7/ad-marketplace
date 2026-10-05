@@ -13,5 +13,6 @@ Rules:
 | [0002](0002-auth-better-auth.md) | Authentication with Better Auth | Accepted (amended by 0005) | 2026-10-02 |
 | [0003](0003-video-mux.md) | Mux for video upload, processing and playback | Superseded by 0005 | 2026-10-02 |
 | [0004](0004-burst-preview-engine.md) | Client-side burst preview with preloaded MP4 clips | Accepted (amended by 0005) | 2026-10-02 |
-| [0005](0005-lean-service-stack.md) | Lean MVP service stack: Vercel + MongoDB only | Accepted | 2026-10-02 |
+| [0005](0005-lean-service-stack.md) | Lean MVP service stack: Vercel + MongoDB only | Accepted (hosting amended by 0007) | 2026-10-02 |
 | [0006](0006-ad-versioning.md) | Keep the approved ad video live while a replacement is reviewed | Accepted | 2026-10-02 |
+| [0007](0007-self-hosted-windows-server.md) | Self-host on the client's Windows Server instead of Vercel | Accepted | 2026-10-05 |
