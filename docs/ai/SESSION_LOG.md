@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-05 · S7 · Self-host on the Windows Server
+- **Branch / PR:** #12 `feat/self-hosted-windows` (merged), `fix/ops-cron-exit`
+- **Goal:** the client moved from Vercel to this Windows Server 2025 machine; a Vercel build had failed on "local driver is refused in production".
+- **Done:** ADR-0007; local storage allowed except on Vercel, `STORAGE_LOCAL_DIR`, `MONGODB_DNS_SERVERS`; `scripts/ops/` (serve, with-env, cron-cleanup, deploy, env-file). Server: NSSM (winget) → service `Flashd` on port 80 from `C:\flashd\app`, settings `C:\flashd-data\config\flashd.env` (generated secrets; Mongo URI copied from `.env.local` by a script with db `flashd_prod`, never printed), firewall rule TCP 80, scheduled task `Flashd cleanup`, admin seeded.
+- **Decisions (user):** IP-only HTTP, existing Atlas cluster, console email for now, media on C:, no Atlas IP restriction for now.
+- **Verification:** `/api/health` → db up via 68.168.20.36; `/`, `/login`, `/signup` 200, `/marketplace` 307 → login; cron 401 without secret, 200 with it; admin sign-in 200 and `/admin` 200 over HTTP.
+- **Open / next:** HTTPS + domain, SMTP, disk space, Atlas IP allow-list.
+
 ## 2026-10-04 · S6 · Merge the PR chain, stop local servers
 - **Branch / PR:** merged #2, #4, #5, #6, #7, #8, #9, #10, #11 into `staging` (squash, branches deleted)
 - **Goal:** user asked to merge everything and stop the running app.

@@ -10,4 +10,6 @@ const res = await fetch(`http://127.0.0.1:${port}/api/cron/cleanup`, {
 });
 const body = await res.text();
 console.info(new Date().toISOString(), res.status, body.slice(0, 300));
-process.exit(res.ok ? 0 : 1);
+// Set exitCode instead of process.exit(): exiting while fetch handles close trips a libuv
+// assertion on Windows, which Task Scheduler would report as a failure.
+process.exitCode = res.ok ? 0 : 1;

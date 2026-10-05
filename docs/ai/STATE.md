@@ -2,10 +2,11 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-04 · S6 (PR chain merged into staging)
+Last updated: 2026-10-05 · S7 (self-hosted on Windows Server)
 
 ## Where we are
-- **The MVP (M0–M8) is merged into `staging`** (PRs #2, #4–#11, squash-merged 2026-10-04 at the user's request; each was re-synced with `staging`, checked locally, and passed `ci` + `security`). Nothing is deployed yet and `main` has no release.
+- **The MVP (M0–M8) is merged into `staging` and runs in production on the client's Windows Server** (ADR-0007): http://68.168.20.36 (HTTP, port 80). NSSM service `Flashd` runs `C:\flashd\app` (clone of `staging`); settings in `C:\flashd-data\config\flashd.env` (admin-only ACL); media in `C:\flashd-data\uploads`; logs in `C:\flashd-data\logs`; Task Scheduler `Flashd cleanup` daily 04:00. Database: the existing Atlas cluster, database `flashd_prod`. Admin `admin@flashd.local` created (password given to the user once, not stored in the repo).
+- Vercel is no longer the target; the Vercel project linked to the repo still builds PRs and fails (harmless; the user may disconnect it).
 - All local servers (dev server, local MongoDB) were stopped at the user's request.
 - **Preview G3:** met on Chromium (rVFC and rAF fallback; numbers in ADR-0004). **Not yet measured on real Safari / iPhone.**
 - **Repo:** github.com/everbee7/ad-marketplace. Default branch `staging`, protected (PR required, no force-push). Required checks not set yet.
@@ -13,7 +14,7 @@ Last updated: 2026-10-04 · S6 (PR chain merged into staging)
 ## Next up (in order)
 1. Set `ci` + `security` as required checks on `staging`/`main` (repo settings).
 2. **Client inputs** (ROADMAP Phase 1D): Vercel team (Pro for Production) + Atlas org, SMTP mailbox, domain (OQ-8), terms/privacy text (PRD §11), logo SVGs (DESIGN §10).
-3. **Staging deploy** (README "Deploying"), seed the admin, run the E2E suite there (`E2E_BASE_URL`), Checkpoint A/B demos.
+3. Before real users: domain + HTTPS (e.g. Caddy in front), SMTP (`EMAIL_TRANSPORT=smtp`), more disk for `STORAGE_LOCAL_DIR` (C: had ~5 GB free), restrict Atlas network access to 68.168.20.36 (user said not needed for now). Redeploy with `node scripts/ops/deploy.mjs staging` in `C:\flashd\app`.
 4. **Real-device check:** iPhone (iOS 16+) + desktop Safari, editor with `?debugPreview=1`, read `window.__flashdPreviewLog` (G3, PRV-04). If it misses, MSE splice via a new ADR.
 5. Cross-browser QA (PRD §12), automated a11y audit, LCP/p95 on Staging. Then Production and Checkpoint C.
 6. Keep `.env.example` in sync with ARCHITECTURE §11.1 (agents couldn't read it this session): new vars `E2E_MODE` (E2E only) and the full list in the table.
@@ -30,6 +31,9 @@ Last updated: 2026-10-04 · S6 (PR chain merged into staging)
 - Real iPhone / Safari for the G3 check.
 
 ## Gotchas
+- Production email is `console`: verification/reset links appear in `C:\flashd-data\logs\flashd.out.log`.
+- `NEXT_PUBLIC_APP_URL` is baked in at build time: after changing it (e.g. a domain), rebuild via `deploy.mjs`.
+- On Windows, don't call `process.exit()` right after `fetch` in scripts (libuv assertion); set `process.exitCode`.
 - `shadcn` is a **devDependency** (its CLI tree failed `npm audit --omit=dev`); only `shadcn/tailwind.css` is used, at build time.
 - Branches cut before a squash-merged base must be re-synced: keep the branch side for conflicts and delete files the merge resurrects (e.g. an old `vitest.config.ts`).
 - Windows dev machine (Git Bash + PowerShell): write tooling in Node; use the Write/Edit tools for file content (heredocs and quotes break; escaped `\|` in markdown tables got mangled once — check tables after scripted edits).
