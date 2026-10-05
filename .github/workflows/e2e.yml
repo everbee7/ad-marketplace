@@ -1,0 +1,28 @@
+name: e2e
+
+# GIT_WORKFLOW.md §CI/CD: smoke tests against the deployed Preview/Staging URL once Vercel reports
+# a successful deployment. Actions never deploys and holds no Vercel tokens.
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Smoke tests
+        run: npx playwright test --grep @smoke --project chromium

@@ -43,6 +43,8 @@ export type AdDoc = {
   approvedAt: Date | null;
   removedAt: Date | null;
   deletedAt: Date | null;
+  /** Set by the cleanup job once storage objects of deleted/removed ads are gone. */
+  mediaPurgedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -84,6 +86,7 @@ const AdSchema = new Schema<AdDoc>(
     approvedAt: { type: Date, default: null },
     removedAt: { type: Date, default: null },
     deletedAt: { type: Date, default: null },
+    mediaPurgedAt: { type: Date, default: null },
   },
   { timestamps: true, strict: true },
 );
@@ -95,6 +98,7 @@ AdSchema.index({ inMarketplace: 1, projectCount: -1, _id: -1 });
 AdSchema.index({ businessId: 1, createdAt: -1 });
 AdSchema.index({ status: 1, submittedAt: 1 });
 AdSchema.index({ status: 1, updatedAt: 1 });
+AdSchema.index({ "pendingUpload.startedAt": 1 }, { sparse: true });
 AdSchema.index(
   { title: "text", description: "text", tags: "text", businessName: "text" },
   { weights: { title: 5, tags: 3, businessName: 2, description: 1 }, name: "ad_text" },
