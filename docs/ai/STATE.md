@@ -2,17 +2,16 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-02 · end of S5 (M0–M8 code complete)
+Last updated: 2026-10-04 · S6 (PR chain merged into staging)
 
 ## Where we are
-- **The MVP is code-complete (M0–M8)** on a chain of stacked PRs, all green locally (`npm run check`: 98 tests; Playwright: 19 specs on a production build). Nothing is merged to `staging` beyond the docs (#1, #3) and nothing is deployed.
-- **Stacked PR chain (merge from the bottom; GitHub retargets each to `staging` as its base merges):**
-  #2 design system → #4 M0 scaffold (contains #2) → #5 M1 accounts → #6 M2 business ads + ADM-02 → #7 M3 marketplace → #8 M4 creator videos → #9 Phase 1C (M5 editor + M6 preview) → #10 M7 admin → M8 hardening (`chore/m8-hardening`).
+- **The MVP (M0–M8) is merged into `staging`** (PRs #2, #4–#11, squash-merged 2026-10-04 at the user's request; each was re-synced with `staging`, checked locally, and passed `ci` + `security`). Nothing is deployed yet and `main` has no release.
+- All local servers (dev server, local MongoDB) were stopped at the user's request.
 - **Preview G3:** met on Chromium (rVFC and rAF fallback; numbers in ADR-0004). **Not yet measured on real Safari / iPhone.**
 - **Repo:** github.com/everbee7/ad-marketplace. Default branch `staging`, protected (PR required, no force-push). Required checks not set yet.
 
 ## Next up (in order)
-1. **User:** review and merge the PR chain from #2 upward (self-merge is blocked for the agent). Then set `ci` + `security` as required checks on `staging`/`main`.
+1. Set `ci` + `security` as required checks on `staging`/`main` (repo settings).
 2. **Client inputs** (ROADMAP Phase 1D): Vercel team (Pro for Production) + Atlas org, SMTP mailbox, domain (OQ-8), terms/privacy text (PRD §11), logo SVGs (DESIGN §10).
 3. **Staging deploy** (README "Deploying"), seed the admin, run the E2E suite there (`E2E_BASE_URL`), Checkpoint A/B demos.
 4. **Real-device check:** iPhone (iOS 16+) + desktop Safari, editor with `?debugPreview=1`, read `window.__flashdPreviewLog` (G3, PRV-04). If it misses, MSE splice via a new ADR.
@@ -31,6 +30,8 @@ Last updated: 2026-10-02 · end of S5 (M0–M8 code complete)
 - Real iPhone / Safari for the G3 check.
 
 ## Gotchas
+- `shadcn` is a **devDependency** (its CLI tree failed `npm audit --omit=dev`); only `shadcn/tailwind.css` is used, at build time.
+- Branches cut before a squash-merged base must be re-synced: keep the branch side for conflicts and delete files the merge resurrects (e.g. an old `vitest.config.ts`).
 - Windows dev machine (Git Bash + PowerShell): write tooling in Node; use the Write/Edit tools for file content (heredocs and quotes break; escaped `\|` in markdown tables got mangled once — check tables after scripted edits).
 - `.gitignore` patterns can hide source folders (the old `uploads/` rule hid `src/features/uploads`). Before each PR: `git ls-files --others --ignored --exclude-standard src tests scripts docs`.
 - A `"use client"` module can't export helpers used by server components (render crash in production). Shared helpers go in plain modules (e.g. `features/videos/format.ts`).

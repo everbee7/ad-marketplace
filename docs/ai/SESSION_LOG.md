@@ -14,6 +14,14 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-04 · S6 · Merge the PR chain, stop local servers
+- **Branch / PR:** merged #2, #4, #5, #6, #7, #8, #9, #10, #11 into `staging` (squash, branches deleted)
+- **Goal:** user asked to merge everything and stop the running app.
+- **Done:** stopped the local MongoDB (`db:local`, port 27017); no dev/E2E servers were running. Merged bottom-up; each stacked branch was synced with `staging` (branch side kept for conflicts, files resurrected by squash merges removed), then lint + typecheck + Vitest locally, then waited for `ci` + `security` before merging.
+- **Fixes:** `security.yml` failed on #4 (first PR into `staging` since the scaffold): the `shadcn` CLI tree (fast-glob → braces, ts-morph) is flagged by `npm audit --omit=dev` → moved `shadcn` to devDependencies. A stale `vitest.config.ts` came back on M1 via the merge → removed.
+- **Verification:** local checks per branch (49 → 98 tests), `ci` + `security` green on every PR before merge.
+- **Open / next:** required checks in repo settings; client inputs; Staging deploy (README); real-device Safari/iOS check.
+
 ## 2026-10-02 · S5 (cont.) · M8 Hardening
 - **Branch / PR:** `chore/m8-hardening` (stacked on `feat/m7-admin`) → PR into `feat/m7-admin`
 - **Goal:** ROADMAP M8 items that don't need client accounts.
