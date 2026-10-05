@@ -2,19 +2,19 @@
 
 > **Snapshot**, overwritten at every handoff (`/handoff`). It is injected automatically at the start of every Claude Code session. History lives in [SESSION_LOG.md](SESSION_LOG.md).
 
-Last updated: 2026-10-05 · S7 (self-hosted on Windows Server)
+Last updated: 2026-10-05 · S8 (pm2 + nginx from the repo folder)
 
 ## Where we are
-- **The MVP (M0–M8) is merged into `staging` and runs in production on the client's Windows Server** (ADR-0007): http://68.168.20.36 (HTTP, port 80). NSSM service `Flashd` runs `C:\flashd\app` (clone of `staging`); settings in `C:\flashd-data\config\flashd.env` (admin-only ACL); media in `C:\flashd-data\uploads`; logs in `C:\flashd-data\logs`; Task Scheduler `Flashd cleanup` daily 04:00. Database: the existing Atlas cluster, database `flashd_prod`. Admin `admin@flashd.local` created (password given to the user once, not stored in the repo).
+- **The MVP (M0–M8) is merged into `staging` and runs in production on the client's Windows Server** (ADR-0007): http://68.168.20.36 (HTTP, port 80), **served from this repo folder**. nginx (`C:\nginx`, config `ops/nginx/nginx.conf`) on :80 → `next start` on `127.0.0.1:3001`. pm2 (`ecosystem.config.cjs`, `PM2_HOME=C:\ProgramData\pm2`) runs `flashd-web`, `flashd-cleanup` (daily 04:00) and `nginx`. Task Scheduler `Flashd pm2` runs `pm2 resurrect` at boot. Settings in the gitignored `.env.production.local`; media in `.data/uploads`; logs in `.data/logs`. Firewall: inbound TCP 80 only. Database: the existing Atlas cluster, database `flashd_prod`. Admin `admin@flashd.local` (password given to the user once, not stored in the repo).
+- The first setup (NSSM service, `C:\flashd`, `C:\flashd-data`, task `Flashd cleanup`, NSSM itself) was removed at the user's request.
 - Vercel is no longer the target; the Vercel project linked to the repo still builds PRs and fails (harmless; the user may disconnect it).
-- All local servers (dev server, local MongoDB) were stopped at the user's request.
 - **Preview G3:** met on Chromium (rVFC and rAF fallback; numbers in ADR-0004). **Not yet measured on real Safari / iPhone.**
 - **Repo:** github.com/everbee7/ad-marketplace. Default branch `staging`, protected (PR required, no force-push). Required checks not set yet.
 
 ## Next up (in order)
 1. Set `ci` + `security` as required checks on `staging`/`main` (repo settings).
 2. **Client inputs** (ROADMAP Phase 1D): Vercel team (Pro for Production) + Atlas org, SMTP mailbox, domain (OQ-8), terms/privacy text (PRD §11), logo SVGs (DESIGN §10).
-3. Before real users: domain + HTTPS (e.g. Caddy in front), SMTP (`EMAIL_TRANSPORT=smtp`), more disk for `STORAGE_LOCAL_DIR` (C: had ~5 GB free), restrict Atlas network access to 68.168.20.36 (user said not needed for now). Redeploy with `node scripts/ops/deploy.mjs staging` in `C:\flashd\app`.
+3. Before real users: domain + HTTPS (443 server block in `ops/nginx/nginx.conf`), SMTP (`EMAIL_TRANSPORT=smtp`), more disk for `STORAGE_LOCAL_DIR` (C: had ~5 GB free), restrict Atlas network access to 68.168.20.36 (user said not needed for now). Redeploy with `node scripts/ops/deploy.mjs staging` in the repo folder.
 4. **Real-device check:** iPhone (iOS 16+) + desktop Safari, editor with `?debugPreview=1`, read `window.__flashdPreviewLog` (G3, PRV-04). If it misses, MSE splice via a new ADR.
 5. Cross-browser QA (PRD §12), automated a11y audit, LCP/p95 on Staging. Then Production and Checkpoint C.
 6. Keep `.env.example` in sync with ARCHITECTURE §11.1 (agents couldn't read it this session): new vars `E2E_MODE` (E2E only) and the full list in the table.
@@ -31,7 +31,9 @@ Last updated: 2026-10-05 · S7 (self-hosted on Windows Server)
 - Real iPhone / Safari for the G3 check.
 
 ## Gotchas
-- Production email is `console`: verification/reset links appear in `C:\flashd-data\logs\flashd.out.log`.
+- Production email is `console`: verification/reset links appear in `.data/logs/web.out.log`.
+- Dev and production share this checkout: `deploy.mjs` checks out the deployed branch, and a running `npm run dev` locks `next-swc` (stop it before `npm ci`). Dev uses :3000, production :3001. Next loads `.env.production.local` over `.env.local` for build/start, so keys only in `.env.local` still leak into production (none matter today).
+- pm2 CLI needs `PM2_HOME=C:\ProgramData\pm2` (machine env; shells opened before S8 lack it, so `export` it in Git Bash). A pm2 cron app restored by `resurrect` stays "stopped" until its next cron tick; that's expected.
 - `NEXT_PUBLIC_APP_URL` is baked in at build time: after changing it (e.g. a domain), rebuild via `deploy.mjs`.
 - On Windows, don't call `process.exit()` right after `fetch` in scripts (libuv assertion); set `process.exitCode`.
 - `shadcn` is a **devDependency** (its CLI tree failed `npm audit --omit=dev`); only `shadcn/tailwind.css` is used, at build time.

@@ -230,7 +230,7 @@ Variables read by `src/env.ts` (validation is lazy, so `next build` needs no run
 | `BETTER_AUTH_URL` | no | Defaults to `NEXT_PUBLIC_APP_URL` |
 | `NEXT_PUBLIC_APP_URL` | no | Default `http://localhost:3000`. Used in email links |
 | `STORAGE_DRIVER` | no | `local` (default; refused only on Vercel) or `blob` |
-| `STORAGE_LOCAL_DIR` | no | Folder of the `local` driver. Default `<app>/.data/uploads`; self-hosted: `C:\flashd-data\uploads` (ADR-0007) |
+| `STORAGE_LOCAL_DIR` | no | Folder of the `local` driver. Default `<app>/.data/uploads` (also used self-hosted, ADR-0007) |
 | `BLOB_READ_WRITE_TOKEN` | with `blob` | Vercel Blob store token |
 | `EMAIL_TRANSPORT` | no | `console` (default) or `smtp` |
 | `EMAIL_FROM` | no | Sender for SMTP |
@@ -238,12 +238,12 @@ Variables read by `src/env.ts` (validation is lazy, so `next build` needs no run
 | `CRON_SECRET` | yes | ≥ 16 chars, Bearer token for `/api/cron/*` |
 | `LOG_LEVEL` | no | `debug` · `info` (default) · `warn` · `error` |
 | `MONGODB_DNS_SERVERS` | no | Comma-separated extra DNS servers for `mongodb+srv` lookups (hosts whose resolver refuses SRV). Development adds 1.1.1.1/8.8.8.8 automatically |
-| `PORT` | no | Self-hosted only: port for `scripts/ops/serve.mjs` (default 80) |
+| `FLASHD_APP_PORT` | no | Self-hosted ops only (pm2 / cron script, not read by the app): internal `next start` port, default 3001. Must match the upstream in `ops/nginx/nginx.conf` |
 | `E2E_MODE` | no | **E2E only.** Lets a production build use the `local` storage driver and the console-email outbox. Never set on Vercel |
 
 DNS note: `lib/db.ts` appends `MONGODB_DNS_SERVERS` (or, in development, 1.1.1.1/8.8.8.8) for `mongodb+srv` URIs, because some Windows setups list a local resolver that refuses SRV queries (`querySrv ECONNREFUSED`).
 
-**Self-hosted production (ADR-0007):** the client's Windows Server runs `next start` as the NSSM service `Flashd` from `C:\flashd\app`, with settings in `C:\flashd-data\config\flashd.env`, media in `C:\flashd-data\uploads`, and Task Scheduler calling the cleanup cron. See README "Deploying on Windows Server".
+**Self-hosted production (ADR-0007):** the client's Windows Server runs the app from the repo folder: nginx on port 80 (`ops/nginx/nginx.conf`) proxies to `next start` on `127.0.0.1:3001`, and pm2 (`ecosystem.config.cjs`) runs the app, nginx and the daily cleanup cron, restored at boot by `pm2 resurrect`. Settings live in the gitignored `.env.production.local`, media in `.data/uploads`. See README "Deploying on Windows Server".
 
 ## 12. Observability
 

@@ -14,6 +14,13 @@
 > - **Open / next:** …
 > ```
 
+## 2026-10-05 · S8 · Deploy from the repo folder with pm2 + nginx
+- **Branch / PR:** `chore/pm2-nginx-deploy`
+- **Goal:** user rejected the separate folders (`C:\flashd`, `C:\flashd-data`) and NSSM: deploy from the current source with nginx + pm2, configure the network, delete the old setup.
+- **Done:** settings moved by a script (values never printed) from `flashd.env` into the gitignored `.env.production.local`. Removed the NSSM service `Flashd`, task `Flashd cleanup`, `C:\flashd`, `C:\flashd-data` (no media yet) and NSSM. Installed nginx 1.30.5 (`C:\nginx`) and pm2 7.0.4 (global). Added `ecosystem.config.cjs`, `ops/nginx/nginx.conf`, `scripts/ops/register-boot.ps1` (machine `PM2_HOME`, boot task `Flashd pm2`, firewall 80). `env-file.mjs` now uses `@next/env`; `deploy.mjs` uses pm2 and runs `npm ci` only when the lockfile changed; `cron-cleanup.mjs` retries while the app starts; `serve.mjs` removed. ADR-0007, README, ARCHITECTURE updated.
+- **Verification:** `npm run check` green (100 tests); nginx `-t` ok; via http://68.168.20.36: health db up, `/` + `/login` 200, `/marketplace` 307; `pm2 kill` → boot task → all back up; cleanup 200; only TCP 80 open inbound, app on 127.0.0.1:3001.
+- **Open / next:** HTTPS + domain, SMTP, disk space.
+
 ## 2026-10-05 · S7 · Self-host on the Windows Server
 - **Branch / PR:** #12 `feat/self-hosted-windows` (merged), `fix/ops-cron-exit`
 - **Goal:** the client moved from Vercel to this Windows Server 2025 machine; a Vercel build had failed on "local driver is refused in production".
